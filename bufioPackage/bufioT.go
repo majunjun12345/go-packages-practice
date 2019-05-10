@@ -10,6 +10,9 @@ import (
 
 /*
 	https://blog.csdn.net/preyta/article/details/80655736
+
+	bufio 是缓冲区，达到条件后向底层数据读或写
+	bytes.buffer 知识存放数据的一个空间
 */
 
 func main() {
