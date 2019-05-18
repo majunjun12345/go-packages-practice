@@ -8,15 +8,31 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	"github.com/alecthomas/kingpin"
 )
 
-var srcDir string = "/Users/majun/Desktop/Secret_19050801005"
-var descDir string = "/Users/majun/Desktop/beeworker.tar.gz"
-var decompressdir string = "/Users/majun/data"
+var (
+	gzipServer       = kingpin.Command("gzipServer", "compress file to gzip ")
+	compressToGzip   = gzipServer.Flag("compressToGzip", "compress the images into tar.gz or not").Short('c').Bool() // 压缩
+	srcDir           = gzipServer.Flag("srcDir", "the direstory to gzip").Default("/Users/majun/Desktop/Secret_19050801005").Short('s').String()
+	descFile         = gzipServer.Flag("descFile", "the gzip file to decompress").Default("./beeworker.tar.gz").Short('d').String()
+	decompressServer = kingpin.Command("decompressServer", "decompress the gzip file")
+	srcFile          = decompressServer.Flag("srcFile", "the source file to decompress").Default("./beeworker.tar.gz").Short('c').String()
+	decompressDir    = decompressServer.Flag("decompressDir", "the directory gzip decompressed to").Default("./").Short('d').String()
+)
 
 func main() {
-	Compress(srcDir, descDir)
-	decompress(descDir, decompressdir)
+	switch kingpin.Parse() {
+	case "gzipServer":
+		fmt.Println(*compressToGzip)
+		if *compressToGzip {
+			Compress(*srcDir, *descFile)
+		}
+	case "decompressServer":
+		decompress(*srcFile, *decompressDir)
+	default:
+	}
 }
 
 // 归档但不压缩
