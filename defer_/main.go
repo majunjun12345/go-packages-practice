@@ -11,6 +11,9 @@ import (
 	匿名返回参数，defer 内对 返回参数的值进行修改，不会影响返回值
 	命名返回参数，defer 内对 返回参数的值进行修改，会影响返回值；defer 函数好想不能有返回值，但是貌似可以 return
 
+	recover:
+	recover 一般放在 defer 函数中捕获错误，必须显式调用；
+
 	defer return 的执行顺序：
 	defer 不能放在 return 后面，否则不会执行！
 */
