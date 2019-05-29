@@ -19,6 +19,15 @@ func main() {
 	fmt.Println(string(content2))
 
 	/*
+		读取目录,但是不能递归
+	*/
+	fileinfos, err := ioutil.ReadDir("../")
+	CheckErr(err)
+	for _, fi := range fileinfos {
+		fmt.Println(fi.Name())
+	}
+
+	/*
 		创建临时目录, "" 表示 /tmp
 	*/
 	dirname, err := ioutil.TempDir("", "example")
