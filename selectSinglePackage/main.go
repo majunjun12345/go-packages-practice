@@ -10,9 +10,12 @@ import (
 // https://www.jianshu.com/p/ae72ad58ecb6
 /*
 	总结：
-	default 和 信号可以一起使用，但是和 超时 貌似不能共存，会忽略超时，一直执行 default 语句
+	超时语句如果放在 case 语句中，每次执行 select 后会重新计算时间。故一般将超时放置在 case 语句外；tick 也最好放置在 for select 语句外；
+	放在外面可以和 default 共存，不然每次执行 default 语句都会重新计时；
 
 	for select 语句中 接收 不到 signal 信号
+
+	for select 中 break 只会跳出 select 语句，要想跳出 for，必须结合 goto 和 标签；
 */
 
 func main() {
@@ -30,9 +33,7 @@ func main() {
 		守护进程即为后台执行的进程
 
 		如果在守护进程中使用 for select 语句来监听信号，感觉监听不到，但是使用 for range 语句可以监听到，原因是使用了 default 语句，去掉 default 语句就行了；
-		总结：default 语句 和 设置超时、监听 signal 一起慎用！
-
-		for select 中 break 只会跳出 select 语句，要想跳出 for，必须结合 goto 和 标签；
+		总结：default 语句 和 监听 signal 一起慎用！
 	*/
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt)
@@ -71,14 +72,20 @@ func main() {
 			a 和 超时 结合 default 使用，能接收到信号退出，不能超时退出，ctrl + c 也不能退出
 				去掉 default 后可以超时退出
 		*/
+
+		timeout := time.After(time.Second * 5)
+		tick := time.Tick(time.Second)
+
 		for {
 			select {
 			case <-a:
 				fmt.Println("收到结束信号")
 				ExitFunc()
-			case <-time.After(time.Second * 1):
+			case <-timeout:
 				fmt.Println("timeout")
 				ExitFunc()
+			case <-tick:
+				fmt.Println("tick")
 			default:
 				fmt.Println("working")
 				time.Sleep(time.Second * 2)
@@ -91,7 +98,7 @@ func main() {
 	for {
 		sum++
 		fmt.Println(sum)
-		time.Sleep(time.Second * 5)
+		time.Sleep(time.Second * 10)
 		a <- 1
 	}
 }
