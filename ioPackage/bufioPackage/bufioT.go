@@ -14,13 +14,15 @@ import (
 	bufio 是缓冲区，达到条件后向底层数据读或写
 	bytes.buffer 只是存放数据的一个空间
 
+	bufio.NewReaderSize 返回的 reader，可以 read readByte readBytes readLine readRune readString
+
 	scan 可以实现按 行 字节 字符串 单词读，由于其他方法
 */
 
 func main() {
-	// testRead()
+	testRead()
 	// testWrite()
-	testScan()
+	// testScan()
 }
 
 // read 是从 os.reader 读取数据
@@ -41,7 +43,7 @@ func testRead() {
 		// data := make([]byte, 101)
 		// n, err := buf.Read(data)
 
-		data, err := buf.ReadString('\n')
+		data, err := buf.ReadString('\n')       // 相当于 readLine，注意这里是单引号
 		line := strings.TrimSpace(string(data)) // 去掉 space
 		if line != "" {                         // 有可能读到空行
 			fmt.Println(line)
