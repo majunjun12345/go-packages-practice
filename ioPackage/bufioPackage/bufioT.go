@@ -12,7 +12,9 @@ import (
 	https://blog.csdn.net/preyta/article/details/80655736
 
 	bufio 是缓冲区，达到条件后向底层数据读或写
-	bytes.buffer 知识存放数据的一个空间
+	bytes.buffer 只是存放数据的一个空间
+
+	scan 可以实现按 行 字节 字符串 单词读，由于其他方法
 */
 
 func main() {

@@ -14,6 +14,7 @@ func main() {
 	/*
 		直接读取文件内容,参数是文件名
 	*/
+	// ioutil.ReadAll(reader)
 	content2, err := ioutil.ReadFile("current.bak")
 	CheckErr(err)
 	fmt.Println(string(content2))
