@@ -1,8 +1,9 @@
 package main
 
 import (
-	"errors"
 	"fmt"
+	"testGoScripts/errorPackage/errorx"
+	_ "testGoScripts/errorPackage/errorx"
 )
 
 type HttpError struct {
@@ -24,5 +25,7 @@ func (he *HttpError) Error() string {
 }
 
 func main() {
-	errors.New("err")
+	a := 150
+	newErr := errorx.IllegalState.New("unfortunate", "majun", "mamengli", a)
+	fmt.Printf("%+v", errorx.Decorate(newErr, "this could be so much better"))
 }
