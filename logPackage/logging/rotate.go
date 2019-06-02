@@ -11,6 +11,10 @@ import (
 	"time"
 )
 
+/*
+   Writer 对象重写了 Writer 和 Close 方法
+*/
+
 const (
 	maxDefault  = 1024 * 1024 * 8
 	keepDefault = 10
