@@ -2,32 +2,35 @@ package main
 
 import (
 	"io"
-	"log"
-	"os"
+	"uploader2/logging"
+
+	gologging "github.com/op/go-logging"
 )
 
 /*
-	log package:
-	三个设置：prefix flag output，output 可以设置多个
-	三种输出：
-	print：就是普通 print
-	panic：print + panic
-	fatal：print + os.Exit(1)
+	backaend 就是输出至不同位置,终端 或 文件
+
+	流程:
+	1. GetLogger
+	MustGetLogger 和 GetLogger 功能一样,当不能写日志时会 panic
+	2. format
+	可以定义多个 format,不同的 backend 会形成不同的 format
+	3. backend
+	可以定义 stdout 和 file,将日志在文件和终端中显示
+
 */
 
-var logger log.Logger
+var (
+	logger  *gologging.Logger
+	logFile io.WriteCloser
+)
 
 func init() {
-	logger.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
-	logger.SetPrefix("【info】")
-	fi, err := os.OpenFile("logtest.log", os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
-	if err != nil {
-		panic(err)
-	}
-	out := io.MultiWriter(fi, os.Stdout)
-	logger.SetOutput(out)
+	logger, logFile = logging.InitLogger("./logs", "uploader", true)
 }
 
 func main() {
-	logger.Println("menglima   --=")
+	logger.Info("mamengli")
+	logger.Warning("menglima")
+
 }
