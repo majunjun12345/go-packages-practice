@@ -34,7 +34,7 @@ import (
 // 	logger, logFile = logging.InitLogger("./logs", "uploader", true)
 // }
 
-func main() {
+func main1z() {
 	// logger.Info("mamengli")
 	// logger.Warning("menglima")
 
