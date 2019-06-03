@@ -18,7 +18,7 @@ import (
 
 	decoder：从 reader 流 或 解析大数据，或 resp body，参数是 reader
 		json.Decoder会一个一个元素进行加载，不会把整个json数组读到内存里面
-		如果使用 token，需要建立 for 循环，读出的是 struct 对象
+		如果使用 token(必须是数组)，需要建立 for 循环，读出的是 struct 对象
 		如果不使用 token，不需要 for 循环，读出的是 struct 对象数组
 */
 
