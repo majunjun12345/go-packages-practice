@@ -120,7 +120,7 @@ var (
 	postText    = post.Arg("text", "Text to post.").Strings()
 )
 
-func main() {
+func main0() {
 	switch kingpin.MustParse(app.Parse(os.Args[1:])) {
 	// Register user
 
