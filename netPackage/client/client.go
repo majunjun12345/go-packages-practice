@@ -11,6 +11,8 @@ import (
 	fmt.Fprintf 向 writer 里面写数据
 
 	可以在 conn 里面读取数据，也可以往里面写入数据
+
+	ReadString('\n') 注意分隔符，还可以使用 readline
 */
 
 func main() {
