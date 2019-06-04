@@ -15,6 +15,8 @@ import (
 	需要传参的可以用 prepare + Exec 或 相关接受参数的 api
 
 	DATE 字段和 time.Time 类型相呼应
+
+	stmt 每次都需要关闭
 */
 func mainFile() {
 	db, err := sql.Open("sqlite3", "./foo.db")
@@ -34,6 +36,7 @@ func mainFile() {
 
 	// insert
 	stmt, err := db.Prepare("insert into userinfo(username, departname, created) values (?,?,?)")
+	defer stmt.Close()
 	CheckErr(err)
 	res, err := stmt.Exec("wangshubo", "国务院", "2017-04-21")
 	CheckErr(err)
@@ -43,6 +46,7 @@ func mainFile() {
 
 	// update
 	stmt, err = db.Prepare("update userinfo set username=? where uid=?")
+	defer stmt.Close()
 	CheckErr(err)
 	res, err = stmt.Exec("wangshubo_new", id)
 	CheckErr(err)
@@ -69,6 +73,7 @@ func mainFile() {
 
 	// delete
 	stmt, err = db.Prepare("delete from userinfo where uid=?")
+	defer stmt.Close()
 	res, _ = stmt.Exec(10)
 	affect, _ := res.RowsAffected()
 	fmt.Println(affect)
