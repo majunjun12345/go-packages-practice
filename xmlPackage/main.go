@@ -21,7 +21,7 @@ type Person struct {
 	Comment string `xml:",comment"` // 加，和不加有区别
 }
 
-func main() {
+func main0() {
 	v := &Person{Id: 13, FirstName: "John", LastName: "Doe", Age: 42}
 	v.Comment = " Need more details. "
 	v.Address = Address{"Hanga Roa", "Easter Island"}
@@ -78,7 +78,7 @@ func main() {
 	fmt.Printf("%+v\n", v1)
 	/*
 		{XMLName:{Space: Local:Person}
-		Name:Grace R. Emlin 
+		Name:Grace R. Emlin
 		Phone:none
 		Email:[{Where:home Addr:gre@example.com} {Where:work Addr:gre@work.com}]
 		Groups:[]
