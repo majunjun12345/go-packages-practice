@@ -21,10 +21,15 @@ import (
 func main() {
 	// testOrderA() // 1 2 defer
 	// testOrderB() // 1
-	fmt.Println("main:", testOrderC()) // main: JSON: internal error: open test.test: no such file or directory
+	// fmt.Println("main:", testOrderC()) // main: JSON: internal error: open test.test: no such file or directory
 
 	// fmt.Println(testDeferA()) // 0
 	// fmt.Println(testDeferB()) // 1
+
+	/*
+		输出 222 但不输出 111, panic 后面的 defer 不会执行
+	*/
+	deferPanic()
 }
 
 func testOrderA() {
@@ -79,4 +84,14 @@ func testDeferB() (i int) { // 命名返回参数
 		i++
 	}()
 	return
+}
+
+func deferPanic() {
+	defer func() {
+		fmt.Println("222")
+	}()
+	panic("panic")
+	defer func() {
+		fmt.Println("111")
+	}()
 }
