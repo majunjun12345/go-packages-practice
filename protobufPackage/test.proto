@@ -1,0 +1,11 @@
+//这里的语法必须使用proto2,在proto3的版本中和optional参数冲突了
+syntax = "proto2";
+//显式生命报名，在其他消息格式定义中可以使用package.message的方式来使用类型
+//比如goprotobuf.HelloWorld
+package goprotobuf;
+//声明一个消息体描述一个请求或者响应的消息格式
+message HelloWorld {
+    required int32     id = 1;
+    required string    name = 2;
+    optional int32     opt = 3;
+}
