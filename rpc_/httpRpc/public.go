@@ -25,3 +25,8 @@ func (t *Arith) Divide(args *Args, reply *Quotient) error {
 	reply.Rem = args.A % args.B
 	return nil
 }
+
+func (t *Arith) Minus(args *Args, reply *int) error {
+	*reply = args.A - args.B
+	return nil
+}

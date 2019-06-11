@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/rpc"
 	"os"
-	"testGoScripts/rpc_/rpc1"
+	rpc1 "testGoScripts/rpc_/httpRpc"
 )
 
 func main() {
@@ -36,4 +36,9 @@ func main() {
 		log.Fatal("arith error:", err)
 	}
 	fmt.Printf("Arith: %d/%d=%d remainder %d\n", args.A, args.B, quot.Quo, quot.Rem)
+
+	args1 := &rpc1.Args{8, 5}
+	var reply1 int
+	err = client.Call("Arith.Minus", args1, &reply1)
+	fmt.Printf("Arith: %d-%d=%d\n", args1.A, args1.B, reply1)
 }

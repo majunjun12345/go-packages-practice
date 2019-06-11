@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 	"net/rpc"
-	"testGoScripts/rpc_/rpc1"
+	rpc1 "testGoScripts/rpc_/httpRpc"
 )
 
 /*
