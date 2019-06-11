@@ -5,15 +5,8 @@ import (
 	"log"
 	"net/rpc"
 	"os"
+	"testGoScripts/rpc_/rpc1"
 )
-
-type Args struct {
-	A, B int
-}
-
-type Quotient struct {
-	Quo, Rem int
-}
 
 func main() {
 	if len(os.Args) != 2 {
@@ -28,7 +21,7 @@ func main() {
 	}
 
 	// synchronous call
-	args := &Args{17, 8}
+	args := &rpc1.Args{17, 8}
 
 	var reply int
 	err = client.Call("Arith.Multiply", args, &reply)
@@ -37,7 +30,7 @@ func main() {
 	}
 	fmt.Printf("Arith: %d*%d=%d\n", args.A, args.B, reply)
 
-	var quot Quotient
+	var quot rpc1.Quotient
 	err = client.Call("Arith.Divide", args, &quot)
 	if err != nil {
 		log.Fatal("arith error:", err)
