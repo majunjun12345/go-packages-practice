@@ -1,9 +1,19 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+	"io"
 	"os"
 )
+
+// https://baijiahao.baidu.com/s?id=1628393222631709276&wfr=spider&for=pc
+
+/*
+	明白两点：
+	defer 后面跟 函数 和 必包对变量的影响不一样
+	return 后面带不带变量，defer 的影响也不一样
+*/
 
 /*
 	defer return 返回值：
@@ -29,7 +39,13 @@ func main() {
 	/*
 		输出 222 但不输出 111, panic 后面的 defer 不会执行
 	*/
-	deferPanic()
+	// deferPanic()
+
+	Tparams()
+	// mergeFile()
+	// f1()
+	// f2()
+	// f3()
 }
 
 func testOrderA() {
@@ -94,4 +110,87 @@ func deferPanic() {
 	defer func() {
 		fmt.Println("111")
 	}()
+}
+
+// ------------------------------------------------------------
+/*
+	每次defer语句执行的时候，会把函数“压栈”，函数参数会被拷贝下来;
+
+	在defer函数定义时，对外部变量的引用是有两种方式的，分别是作为函数参数和作为闭包引用。
+	作为函数参数，则在defer定义时就把值传递给defer，并被cache起来，是拷贝，不会随着以后的更改而改变；(感觉也是引用)，只有在执行裸代码块的时候才是赋值, 详情见下面两个函数
+	作为闭包引用，则会在defer函数真正调用时根据整个上下文确定当前的值。
+
+	defer语句并不会马上执行，而是会进入一个栈，函数return前，会按先进后出的顺序执行;
+
+	return xxx 和 defer 的执行顺序：1 和 3 才是 return 真正执行的命令
+	1. 返回值 = xxx
+	2. 调用defer函数
+	3. 空的return
+*/
+
+func Tparams() {
+	t := []int{1}
+
+	// 1 和 2 一样，和 3 不一样
+	// 1
+	defer func() {
+		fmt.Println(t) // 7  "引用" 必包
+	}()
+	t = append(t, 2)
+	// 1
+	defer func(i []int) {
+		fmt.Println(t) // 7  "引用"  函数
+	}(t)
+	t = append(t, 3)
+	// 3
+	defer fmt.Println(t) // 6  "传值"  函数
+	t = append(t, 4)
+}
+
+// 不明白上下两个函数的执行机制不一样，下面是传值，上面是传址
+func mergeFile() error {
+	fmt.Println("begin")
+	f, _ := os.Open("file1.txt")
+	if f != nil {
+		defer func(f io.Closer) {
+			fmt.Println("222", f) // 222 &{0xc00004c120}
+			if err := f.Close(); err != nil {
+				fmt.Printf("defer close file1.txt err %v\n", err)
+			}
+		}(f)
+	}
+	// ……
+	f, _ = os.Open("file2.txt")
+	if f != nil {
+		defer func(f io.Closer) {
+			fmt.Println("111", f) // 111 &{0xc000094000}
+			if err := f.Close(); err != nil {
+				fmt.Printf("defer close file2.txt err %v\n", err)
+			}
+		}(f)
+	}
+	return nil
+}
+
+func f1() {
+	var err error
+	defer fmt.Println(err) // nil 函数
+	err = errors.New("defer error")
+	return
+}
+func f2() {
+	var err error
+	defer func() { // defer error 必包
+		fmt.Println(err)
+	}()
+	err = errors.New("defer error")
+	return
+}
+func f3() {
+	var err error
+	defer func(err error) {
+		fmt.Println(err) // 函数 nil
+	}(err)
+	err = errors.New("defer error")
+	return
 }
