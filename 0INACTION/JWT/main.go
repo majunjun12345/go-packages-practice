@@ -13,6 +13,42 @@ import (
 	"github.com/urfave/negroni"
 )
 
+/*
+	JWT 包含三部分：
+	头：
+		{
+			"alg": "HS256",
+			"typ": "JWT"
+		}
+		使用 base64 url 得出字符串
+	有效载荷(json对象)：
+		iss：发行人
+		exp：到期时间
+		sub：主题
+		aud：用户
+		nbf：在此之前不可用
+		iat：发布时间
+		jti：JWT ID用于标识该JWT
+		自定义字段：
+			"sub": "1234567890",
+			"name": "chongchong",
+			"admin": true
+		使用 base64 url 得出字符串，未加密，勿放私密信息
+	签名哈希：
+		使用 secret 对以上两部分使用指定签名方法进行签名
+
+	上述三个部分字符串组合，使用 . 连接
+	eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NjA0OTI4MTgsImlhdCI6MTU2MDQ4OTIxOH0.L8FgH3846II40WQnsWfzN7Dbdhdb2K9rYpA9bPNzjb8
+
+	用法：
+	客户端：
+		服务端先以 json 形式返回 token
+		客户端下次请求将其放在请求头的 Authorization: Bearer 中能够实现跨域问题；
+		Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NjA0OTI4MTgsImlhdCI6MTU2MDQ4OTIxOH0.L8FgH3846II40WQnsWfzN7Dbdhdb2K9rYpA9bPNzjb8
+	服务端：
+		校验 token
+*/
+
 const (
 	SecretKey = "welcome to wangshubo's blog"
 )
@@ -43,6 +79,10 @@ type Token struct {
 	Token string `json:"token"`
 }
 
+func main() {
+	StartServer()
+}
+
 func StartServer() {
 
 	http.HandleFunc("/login", LoginHandler)
@@ -54,10 +94,6 @@ func StartServer() {
 
 	log.Println("Now listening...")
 	http.ListenAndServe(":1234", nil)
-}
-
-func main() {
-	StartServer()
 }
 
 func ProtectedHandler(w http.ResponseWriter, r *http.Request) {
@@ -119,6 +155,16 @@ func ValidateTokenMiddleware(w http.ResponseWriter, r *http.Request, next http.H
 			return []byte(SecretKey), nil
 		})
 
+	fmt.Printf("token:%+v", token)
+	/*
+		{Raw:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NjA0OTI4MTgsImlhdCI6MTU2MDQ4OTIxOH0.L8FgH3846II
+		40WQnsWfzN7Dbdhdb2K9rYpA9bPNzjb8
+		Method:0xc0000a82e0
+		Header:map[alg:HS256 typ:JWT]    first segment
+		Claims:map[exp:1.560492818e+09 iat:1.560489218e+09]   second segment
+		Signature:L8FgH3846II40WQnsWfzN7Dbdhdb2K9rYpA9bPNzjb8   third segment
+		Valid:true}
+	*/
 	if err == nil {
 		if token.Valid {
 			next(w, r)
@@ -135,7 +181,7 @@ func ValidateTokenMiddleware(w http.ResponseWriter, r *http.Request, next http.H
 
 func JsonResponse(response interface{}, w http.ResponseWriter) {
 
-	json, err := json.Marshal(response)
+	responseData, err := json.Marshal(response)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -143,5 +189,5 @@ func JsonResponse(response interface{}, w http.ResponseWriter) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(json)
+	w.Write(responseData)
 }
