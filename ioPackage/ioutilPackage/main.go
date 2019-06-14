@@ -19,6 +19,8 @@ func main() {
 	CheckErr(err)
 	fmt.Println(string(content2))
 
+	// ioutil.ReadAll()
+
 	/*
 		读取目录,但是不能递归
 	*/

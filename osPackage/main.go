@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"os"
@@ -30,6 +31,11 @@ func main() {
 	if _, err = os.Stat("docker"); os.IsNotExist(err) { // state fileinfo，IsNotExist 判断错误类型
 		fmt.Println("file does not exit")
 	}
+
+	buf := bufio.NewWriter(os.Stdout)
+	n, err := buf.WriteString("========")
+	buf.Flush()
+	fmt.Println(n, err)
 
 	os.Exit(1)
 }
