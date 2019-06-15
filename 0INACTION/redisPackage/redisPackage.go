@@ -22,9 +22,12 @@ func main() {
 
 	// HashRedis()
 
-	ListRedis()
+	// ListRedis()
+
+	SetRedis()
 }
 
+// string
 func StringRedis() {
 	// 0 表示永久有效
 	fmt.Println(cli.Set("key", "101", 0).Args()) // [set key value]
@@ -113,4 +116,34 @@ func ListRedis() {
 	// cli.LTrim("lnames", -2, -1) // 只保留指定区间的值
 
 	cli.RPopLPush("lnames", "lnumbers") // 将左尾移到右头
+}
+
+// set
+func SetRedis() {
+
+	// 无序集合,元素不能重复
+	// cli.SAdd("sid", "01", "02", "03", "04", "05", "06") // 添加元素,没有则创建
+	// cli.SAdd("sid1", "04", "05", "06", "07", "08")
+	// fmt.Println(cli.SCard("sid"))   // 获取元素个数
+
+	// fmt.Println(cli.SDiff("sid", "sid1")) // 获取两个 key 所对应的集合的差集
+	// fmt.Println(cli.SDiffStore("sid2", "sid", "sid1")) // sid 和 sid1 的差集存储到 sid2 中
+	// cli.SInter()  // 交集
+	// cli.SUnion()  // keys 的并集
+
+	// fmt.Println(cli.SIsMember("sid", "01").Result()) // 是否存在该元素
+	// fmt.Println(cli.SRandMember("sid").Result()) //随机获取几个或多个元素
+	// fmt.Println(cli.SMembers("sid")) // 获取所有元素
+
+	// cli.SAdd("sid3")
+	// cli.SMove("sid", "sid3", "04") // 将指定元素从 sid 移到 sid3
+
+	// fmt.Println(cli.SPop("sid").Result())     // 移除随机元素
+	// fmt.Println(cli.SPopN("sid", 2).Result()) // 移除随机元素
+	// fmt.Println(cli.SRem("sid", "07").Result()) // 移除指定元素
+
+	iter := cli.SScan("sid", 0, "", 1).Iterator()
+	for iter.Next() {
+		fmt.Println(iter.Val())
+	}
 }
