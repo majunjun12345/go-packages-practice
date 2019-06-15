@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/go-redis/redis"
@@ -24,7 +25,9 @@ func main() {
 
 	// ListRedis()
 
-	SetRedis()
+	// SetRedis()
+
+	ZsetRedis()
 }
 
 // string
@@ -146,4 +149,64 @@ func SetRedis() {
 	for iter.Next() {
 		fmt.Println(iter.Val())
 	}
+}
+
+func ZsetRedis() {
+	// scores := []*redis.Z{}
+	// score1 := &redis.Z{98, "math"}
+	// score2 := &redis.Z{89, "eng"}
+	// score3 := &redis.Z{76, "chi"}
+	// score4 := &redis.Z{63, "phy"}
+	// score5 := &redis.Z{52, "che"}
+	// score6 := &redis.Z{71, "geo"}
+	// scores = append(scores, score1, score2, score3, score4, score5, score6)
+	// fmt.Println(cli.ZAdd("zscore", scores...).String())
+
+	/*
+		Zadd 更新或插入
+		ZAddNX 不改变已有
+		ZAddXX 只改变已有的
+		ZAddch 返回被修改的元素的个数,返回 0 表示没有被修改.返回 1 表示被修改或者插入;
+	*/
+	// fmt.Println(cli.ZAdd("zscore", &redis.Z{101, "eng"}).String())
+	// fmt.Println(cli.ZAddCh("zscore", &redis.Z{101, "eng"}).String())
+	// fmt.Println(cli.ZAddXX("zscore", &redis.Z{89, "eng"}).String())
+	// fmt.Println(cli.ZAddCh("zscore", &redis.Z{89, "xxx"}).Result())
+
+	// fmt.Println(cli.ZCard("zscore"))                       // zset 中的成员数
+	// fmt.Println(cli.ZCount("zscore", "0", "100").Result()) // 分数区间的元素个数
+	// fmt.Println(cli.ZRange("zscore", 0, 100).Result()) // 返回介于分数区间的元素
+	// fmt.Println(cli.ZRangeWithScores("zscore", 0, 100).Result()) // 返回介于分数区间的元素及对应的分数
+	// fmt.Println(cli.ZRangeByScore("zscore", &redis.ZRangeBy{"0", "100", 0, 0}).Result()) // 返回分数区间对应的元素,还有参数 offset 和 count
+
+	// 有坑
+	// results := make([]MyStruct, 1)
+	// fmt.Println(cli.ZRangeByScore("zscore", &redis.ZRangeBy{"0", "100", 1, 1}).ScanSlice(&results)) // 返回分数区间对应的元素,还有参数 offset 和 count
+	// fmt.Printf("%+v", results)
+
+	// fmt.Println(cli.ZRank("zscore", "===").String()) // 获取元素排名, 从低到高
+	// fmt.Println(cli.ZRem("zscore", "===").Result()) // 删除元素
+	// fmt.Println(cli.ZRevRange("zscore", 0, 100).Result()) // 区间内所有元素,从大到小排列
+	// fmt.Println(cli.ZScore("zscore", "eng").Result()) // 获取指定元素的分数
+
+	/*
+		ZIncrNX: 没有就插入
+		ZIncrXX: 只改变已有的
+	*/
+	// fmt.Println(cli.ZIncrBy("zscore", 5, "eng").Result())
+	// fmt.Println(cli.ZIncrNX("zscore", &redis.Z{5, "==="}).Result())
+	// fmt.Println(cli.ZIncrXX("zscore", &redis.Z{5, "[{{{{"}).Result())
+
+	// cli.ZInterStore("zscore1", &redis.ZStore{}, "zscore").Result() // 将 keys 的交集存储在新的 key 中
+
+	// fmt.Println(cli.ZLexCount("zsocre", "[80", "[100").Result())   // 不知道是干啥的
+
+	cli.ZScan
+}
+
+type MyStruct redis.Z
+
+func (m *MyStruct) UnmarshalBinary(data []byte) error {
+	// convert data to yours, let's assume its json data
+	return json.Unmarshal(data, m)
 }
