@@ -20,7 +20,9 @@ func main() {
 
 	// StringRedis()
 
-	HashRedis()
+	// HashRedis()
+
+	ListRedis()
 }
 
 func StringRedis() {
@@ -82,5 +84,33 @@ func HashRedis() {
 	fmt.Println(cli.HLen("myinfo").Result())
 	fmt.Println(cli.HSetNX("myinfo", "phone", "189").Result())
 
-	cli.HScan("myinfo", 0, "", 2)
+	iter := cli.HScan("myinfo", 0, "", 1).Iterator() // 参数:redis的键,从哪里开始迭代, 匹配的value, 每次获取 value的个数 (hash 的 key value 是分开的)
+	for iter.Next() {
+		fmt.Println("1111")
+		iter.Next() // 这样可以忽略 hash 的 key
+		fmt.Println("iter value:", iter.Val())
+	}
+}
+
+// list
+func ListRedis() {
+
+	// cli.LPush("lnames", "masanqi", "1", "2", "3", "4") // 新建并插入元素, 可以一次性插入多个, 最后面参数在redis最前面
+	// fmt.Println(cli.LPushX("lnames", "menglima").Result()) // 插入到头部
+	// cli.RPush("lnames", "lisi") // 插入到尾部
+	// fmt.Println(cli.LIndex("lnames", -1).Result()) // 获取指定索引的值
+	// fmt.Println(cli.LRange("lnames", 0, -1).Result()) // 获取 index 区间值
+	// fmt.Println(cli.LLen("lnames").Result()) // 获取 list 长度
+
+	// fmt.Println(cli.LSet("lnames", 1, "l1")) // 在指定 index 插入
+	// cli.LInsert("lnames", "BEFORE", "lisi", "wangwu") // 在指定值 前/后 插入
+	// cli.LInsertAfter("lnames", "lisi", "sunliu")
+	// cli.LInsertBefore("lnames", "menglima", "hahaha") // 在发现的第一个元素前插入
+
+	// cli.LPop("lnames").Result() // 删除头部
+	// cli.RPop("lnames") // 删除尾部
+	// fmt.Println(cli.LRem("lnames", 2, "menglima").Result()) // 删除指定元素个数
+	// cli.LTrim("lnames", -2, -1) // 只保留指定区间的值
+
+	cli.RPopLPush("lnames", "lnumbers") // 将左尾移到右头
 }
