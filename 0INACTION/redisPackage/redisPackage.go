@@ -179,7 +179,7 @@ func ZsetRedis() {
 	// fmt.Println(cli.ZRangeWithScores("zscore", 0, 100).Result()) // 返回介于分数区间的元素及对应的分数
 	// fmt.Println(cli.ZRangeByScore("zscore", &redis.ZRangeBy{"0", "100", 0, 0}).Result()) // 返回分数区间对应的元素,还有参数 offset 和 count
 
-	// 有坑
+	// 有坑, 暂时还不会用.原因是 cli 获取到的是 二进制, 好像不能直接映射为 go 的对象
 	// results := make([]MyStruct, 1)
 	// fmt.Println(cli.ZRangeByScore("zscore", &redis.ZRangeBy{"0", "100", 1, 1}).ScanSlice(&results)) // 返回分数区间对应的元素,还有参数 offset 和 count
 	// fmt.Printf("%+v", results)
@@ -201,7 +201,12 @@ func ZsetRedis() {
 
 	// fmt.Println(cli.ZLexCount("zsocre", "[80", "[100").Result())   // 不知道是干啥的
 
-	cli.ZScan
+	// iter := cli.ZScan("zscore", 0, "", 1).Iterator()
+	// for iter.Next() {
+	// 	iter.Next() // 忽略 元素,只获取分数值
+	// 	fmt.Println(iter.Val())
+	// }
+
 }
 
 type MyStruct redis.Z
@@ -209,4 +214,7 @@ type MyStruct redis.Z
 func (m *MyStruct) UnmarshalBinary(data []byte) error {
 	// convert data to yours, let's assume its json data
 	return json.Unmarshal(data, m)
+	// encoding.BinaryUnmarshaler()
+	// u := url.URL{}
+	// u.UnmarshalBinary()
 }
