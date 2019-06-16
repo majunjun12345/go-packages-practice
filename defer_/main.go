@@ -12,22 +12,16 @@ import (
 // https://baijiahao.baidu.com/s?id=1628393222631709276&wfr=spider&for=pc
 
 /*
-	明白两点：
-	defer 后面跟 函数 和 必包对变量的影响不一样
-	return 后面带不带变量，defer 的影响也不一样
-*/
-
-/*
-	defer return 返回值：
-	主要的区别在于 返回参数的命名与否
-	匿名返回参数，defer 内对 返回参数的值进行修改，不会影响返回值
-	命名返回参数，defer 内对 返回参数的值进行修改，会影响返回值；defer 函数好想不能有返回值，但是貌似可以 return
 
 	recover:
-	recover 一般放在 defer 函数中捕获错误，必须显式调用；
+	recover 一般放在 defer 函数中捕获错误，必须显式调用,只能捕获最后一个错误；
+
+	defer 不能放在 return 后面，否则不会执行！
 
 	defer return 的执行顺序：
-	defer 不能放在 return 后面，否则不会执行！
+	给返回值赋值
+	执行 defer
+	return
 */
 
 func main() {
@@ -43,11 +37,17 @@ func main() {
 	*/
 	// deferPanic()
 
-	Tparams()
+	// Tparams()
 	// mergeFile()
 	// f1()
 	// f2()
 	// f3()
+
+	// fmt.Println(t1())
+	// fmt.Println(t2())
+	// fmt.Println(t3())
+	fmt.Println(t4())
+	fmt.Println(t5())
 }
 
 func testOrderA() {
@@ -87,6 +87,8 @@ func testOrderC() (err error) {
 	return
 
 }
+
+// ------------------------------------------------------------
 
 func testDeferA() int { // 匿名返回参数
 	i := 0
@@ -131,22 +133,22 @@ func deferPanic() {
 */
 
 func Tparams() {
-	t := []int{1}
+	t := 6
 
 	// 1 和 2 一样，和 3 不一样
 	// 1
 	defer func() {
-		fmt.Println(t) // 7  "引用" 必包
+		fmt.Println(t) // 9  "引用" 必包
 	}()
-	t = append(t, 2)
+	t = t + 1
 	// 1
-	defer func(i []int) {
-		fmt.Println(t) // 7  "引用"  函数
+	defer func(i int) {
+		fmt.Println(t) // 9  "引用"  函数
 	}(t)
-	t = append(t, 3)
+	t = t + 1
 	// 3
-	defer fmt.Println(t) // 6  "传值"  函数
-	t = append(t, 4)
+	defer fmt.Println(t) // 8  "传值"  函数
+	t = t + 1
 }
 
 // 不明白上下两个函数的执行机制不一样，下面是传值，上面是传址
@@ -195,4 +197,63 @@ func f3() {
 	}(err)
 	err = errors.New("defer error")
 	return
+}
+
+// --------------------------------------------读取外部变量  对返回值的改变
+/*
+	使用函数时, 不会受后续参数的改变的影响
+	使用闭包时, 随着后续参数的改变而改变
+
+	匿名返回, 返回值不受 defer 的影响
+	命名返回: 使用函数, 不会改变返回值, 使用闭包, 改变返回值;
+
+	总: 函数不会影响匿名命名返回值,函数内变量也不会受后续变量的改变影响; 闭包影响命名返回值, 不影响匿名返回值, 闭包内变量随后续的改变而改变;
+*/
+
+func t1() int { // 4
+	n := 3
+	defer func(i int) {
+		fmt.Println("defer:", i) // 3  函数, 将上面的值拷贝
+		i++
+	}(n)
+	n++
+	return n
+}
+
+func t2() int { // 4
+	n := 3
+	defer func() {
+		fmt.Println("defer:", n) // 4 闭包, 值相当于是 "引用", 受下面的影响
+		n++
+	}()
+	n++
+	return n
+}
+
+func t3() int { // 4
+	n := 3
+	defer fmt.Println("defer:", n) // 3 函数, 将上面的值拷贝
+	n++
+	return n
+}
+
+// -------------------------- 命名返回参数
+func t4() (n int) { // 4, 函数传值后就变成另外的变量了
+	n = 3
+	defer func(i int) {
+		fmt.Println("defer:", i) // 3 函数
+		i++
+	}(n)
+	n++
+	return
+}
+
+func t5() (n int) { // 5
+	n = 3
+	defer func() {
+		fmt.Println("defer:", n) // 4
+		n++
+	}()
+	n++
+	return n
 }
