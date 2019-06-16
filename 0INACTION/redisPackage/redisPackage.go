@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/go-redis/redis"
 )
@@ -27,7 +28,14 @@ func main() {
 
 	// SetRedis()
 
-	ZsetRedis()
+	// ZsetRedis()
+
+	// PipelineRedis()
+
+	// TransactionRedis()
+
+	PubSubRedis()
+
 }
 
 // string
@@ -217,4 +225,75 @@ func (m *MyStruct) UnmarshalBinary(data []byte) error {
 	// encoding.BinaryUnmarshaler()
 	// u := url.URL{}
 	// u.UnmarshalBinary()
+}
+
+/*
+	管道
+	管道可以理解为一系列命令的打包. 通常, redis 的 cli 与 server 交互时,都是一个命令执行完后,明确收到 server 的反馈信息后才执行下一个命令, 这种交互是堵塞式的,效率比较低下.
+	使用管道后, 多个命令可以放到一起执行, 其实在管道中 redis 还是依次执行每个命令, 不过下个命令不用等到上个命令的执行结果反馈到 client 后再执行;
+*/
+
+func PipelineRedis() {
+	t1 := time.Now().Unix()
+	for i := 0; i < 100000000; i++ {
+		p := cli.Pipeline()
+		p.Set("num", 0, 0)
+		p.Incr("num")
+		p.Incr("num")
+		p.Incr("num")
+		_, err := p.Exec()
+		if err != nil {
+			panic(err)
+		}
+	}
+	t2 := time.Now().Unix()
+	fmt.Println(t2 - t1)
+
+	fmt.Println(cli.Get("num").Result())
+}
+
+func NoPipelineRedis() {
+	t1 := time.Now().Unix()
+	for i := 0; i < 100000; i++ {
+		cli.Set("num", 0, 0)
+		cli.Incr("num")
+		cli.Incr("num")
+		cli.Incr("num")
+	}
+	t2 := time.Now().Unix()
+	fmt.Println(t2 - t1)
+
+	fmt.Println(cli.Get("num").Result())
+}
+
+/*
+	通过 multi 开启事物, 通过 exec 提交事物, discard 回滚一个操作, watch 和 unwatch 可以监控和取消监控指定的 key.
+	事物与管道类似, 也是将多个命令打包, 然后放到一起执行, 区别是如果有命令执行失败, 则回滚;
+*/
+func TransactionRedis() {
+	tx := cli.TxPipeline()
+	tx.Set("num", 0, 0)
+	tx.Incr("num")
+	tx.Incr("num")
+	tx.Incr("num")
+	_, err := tx.Exec()
+	if err != nil {
+		panic(err)
+	}
+}
+
+// pub/sub
+/*
+	pub 和 sub 必须在两个不同的 cli 中使用
+*/
+func PubSubRedis() {
+	fmt.Println(cli.Publish("mychannel", "hello redis!").Err())
+	// sub := cli.Subscribe("mychannel")
+	// msgChan := sub.Channel()
+	// for {
+	// 	select {
+	// 	case msg := <-msgChan:
+	// 		fmt.Println(msg.String())
+	// 	}
+	// }
 }
