@@ -8,6 +8,8 @@ import (
 	"golang.org/x/oauth2"
 )
 
+// 不一样的角度: https://studygolang.com/articles/17363
+
 /*
 	比如:尝试使用 github 登录 github 并进行身份验证
 	条件: 用户有 github 的账号
@@ -25,7 +27,7 @@ import (
 		   会获取到这个 url: https://github.com/login/oauth/authorize?client_id=6155ffa6f3921c4e67d5&redirect_uri=http%3A%2F%2Flocalhost%3A8000%2FGithubCallback&response_type=code&scope=user+repo&state=random
 		   重定向这个链接,会发出请求,定位到 github 的登录界面: https://github.com/login?client_id=6155ffa6f3921c4e67d5&return_to=%2Flogin%2Foauth%2Fauthorize%3Fclient_id%3D6155ffa6f3921c4e67d5%26redirect_uri%3Dhttp%253A%252F%252Flocalhost%253A8000%252FGithubCallback%26response_type%3Dcode%26scope%3Duser%2Brepo%26state%3Drandom
 		   点击登录后, 会请求这个 url: https://github.com/login/oauth/authorize?client_id=6155ffa6f3921c4e67d5&redirect_uri=http%3A%2F%2Flocalhost%3A8000%2FGithubCallback&response_type=code&scope=user+repo&state=random
-		   最后请求回调 url: http://localhost:8000/GithubCallback?code=9c82da7fb8693660399e&state=random
+		   最后请求回调 url,利用 code 换 token: http://localhost:8000/GithubCallback?code=9c82da7fb8693660399e&state=random
 		3. 在 github 界面登录后,选择授权,也就是允许 gitlab 获取用户资料
 		4. 浏览器通过几次跳转后返回 gitlab,这时候我们已经完成了认证登录;
 
