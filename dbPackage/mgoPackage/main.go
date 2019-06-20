@@ -34,7 +34,7 @@ func init() {
 			session 的读操作会向任意的其他服务器发起，多次读操作并不一定使用相同的连接，也就是读操作不一定有序。
 			session 的写操作总是向主服务器发起，但是可能使用不同的连接，也就是写操作也不一定有序。
 	*/
-	session.SetMode(mgo.Monotonic, true) // 设置 mongo 的读写模式
+	// session.SetMode(mgo.Monotonic, true) // 设置 mongo 的读写模式
 	// defer session.Close()   // 不能这样，执行 init 后就关闭了
 	CheckErr(err)
 	c = db.C("people")
@@ -83,9 +83,36 @@ func mgoSearch() {
 
 // -----------------分页
 func mgoPage() {
+
+	/*
+		1. 适合数据量不大的情况，需要排序
+	*/
 	res := []Person{}
-	c.Find(bson.M{"name": "mamengli"}).Select(bson.M{"age": 22}).Skip(0).Limit(10).All(&res)
+	/*
+		selector：1 表示需要该字段，默认是 0
+		sort：前面加上 - 表示倒叙，默认升序
+	*/
+	c.Find(bson.M{"name": "mamengli"}).Select(bson.M{"age": 1, "name": 1}).Sort("-age").Skip(0).Limit(150).All(&res)
 	fmt.Printf("%+v", res)
+
+	/*
+		2. 数据量比较大，不需要排序，将上面的 sort 去掉就行
+	*/
+
+	/*
+		3. 数据量大，需要排序，取得返回值后再进行排序
+		pipeline 就是 mongo 里面的聚合
+	*/
+	// pipeM := []bson.M{
+	// 	{"$match": bson.M{"name": "menglima"}},
+	// 	{"$skip": 0},
+	// 	{"$limit": 10},
+	// 	{"$sort": bson.M{"age": 1}}, // 1 生序，-1 倒叙
+	// }
+	// pipe := c.Pipe(pipeM)
+	// err := pipe.All(&res)
+	// CheckErr(err)
+	// fmt.Println(res)
 }
 
 func mgoUpdate() {
