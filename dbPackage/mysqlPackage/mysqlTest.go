@@ -9,17 +9,7 @@ import (
 )
 
 /*
-	插入:
-		时间类型:
-			go 先获取格式化的时间字符串, mysql 会根据事先定义的字段类型进行转换
-		bool 类型:
-			go 可以传递自己定义的 bool 类型, mysql 的 bool 类型会将其转换为 0(false) 和 1(true)
-		id 自增:
-			定义不赋值即可
-	查询:
-		从数据库中获取到的时间映射到 go 中是字符串, 所以 go 的接收类型必须是字符串
-		数据库中获取到的 bool 类型映射到 go 中的是 int,所以 go 的接收类型必须是 int
-		由于这两个特殊字段的关系,不太好直接映射到 go 中的 struct
+	go 和 mysql 中的 事件类型和bool 类型可以相互转换
 */
 
 /*
@@ -89,7 +79,7 @@ func query() {
 	var n int
 	for rows.Next() {
 		user := UserInfo{}
-		rows.Scan(&user.Id, &user.Username, &t, &n)
+		rows.Scan(&user.Id, &user.Username, &t, &n) // 和 query 一一对应,最好不要用 *
 		fmt.Println(n)
 	}
 }
@@ -97,10 +87,7 @@ func query() {
 func GetTime() string {
 	const shortForm = "2006-01-02 15:04:05"
 	t := time.Now()
-	temp := time.Date(t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), time.Local)
-	str := temp.Format(shortForm)
-	fmt.Println(t)
-	return str
+	return t.Format(shortForm)
 }
 
 func CheckErr(err error) {
