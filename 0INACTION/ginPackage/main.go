@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -76,8 +77,7 @@ func CreateUser(c *gin.Context) {
 }
 
 func FetchAllUsers(c *gin.Context) {
-	var user User
-	var users []User
+
 	var result gin.H
 	rows, err := DB.Query("select username, created, id, married from userinfo")
 	if err != nil {
@@ -88,17 +88,17 @@ func FetchAllUsers(c *gin.Context) {
 		c.JSON(http.StatusOK, result)
 	}
 
-	// var create time.Time
-	// var m int
+	// 返回多行
+	var users []User
+	i := 0
 	for rows.Next() {
-		err := rows.Scan(&user.UserName, &user.Created, &user.ID, &user.Married) // 这里的字段必须和上面的一一对应, 如果 query *,则完全不知道顺序
-		CheckErr(err)
-		// if m == 1 {
-		// 	user.Married = true
-		// } else {
-		// 	user.Married = false
-		// }
+		var user User
 		users = append(users, user)
+		// 这里的字段必须和上面的一一对应, 如果 query *,则完全不知道顺序
+		err := rows.Scan(&users[i].UserName, &users[i].Created, &users[i].ID, &users[i].Married)
+		CheckErr(err)
+		i++
+		fmt.Println(i)
 	}
 
 	result = gin.H{
