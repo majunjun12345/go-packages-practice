@@ -1,11 +1,12 @@
 package db
 
 import (
+	"fmt"
 	"strconv"
-	"testGoScript/0INACTION/routerRedisRestful/common"
-	"testGoScript/0INACTION/routerRedisRestful/models"
+	"testGoScripts/0INACTION/routerRedisRestful/common"
+	"testGoScripts/0INACTION/routerRedisRestful/models"
 
-	"github.com/garyburd/redigo/redis"
+	"github.com/gomodule/redigo/redis"
 )
 
 var Conn redis.Conn
@@ -50,18 +51,33 @@ func Insert(u *models.User) error {
 	return err
 }
 
-func FindOne() {
+func FindOneByID(id int) (*models.User, error) {
+	v, err := redis.Values(Conn.Do("HGETALL", strconv.Itoa(id)))
+	if err != nil {
+		return nil, err
+	}
 
+	var u models.User
+	err = redis.ScanStruct(v, &u)
+	if err != nil {
+		return nil, err
+	}
+	return &u, nil
 }
 
-func FindAdd() {
-
+func Delete(i int) error {
+	_, err := Conn.Do("DEL", strconv.Itoa(i))
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func Delete() {
-
-}
-
-func Update() {
-
+func Update(i int, u models.User) (*models.User, error) {
+	result, err := Conn.Do("HMSET", redis.Args{}.Add(i).AddFlat(u)...) // HMSET 可以将 struct 直接映射成 map, 标签注明redis
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println("===", result) // OK
+	return nil, nil
 }

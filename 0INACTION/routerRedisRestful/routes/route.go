@@ -20,4 +20,28 @@ var routes = Routes{
 		"/",
 		Index,
 	},
+	Route{
+		"index",
+		"POST",
+		"/user/insert",
+		Insert,
+	},
+	Route{
+		"index",
+		"GET",
+		"/user/:uid",
+		Get,
+	},
+}
+
+func NewRouter() *mux.Router {
+
+	router := mux.New()
+
+	for _, route := range routes {
+
+		router.Handle(route.Method, route.Pattern, route.Handle)
+	}
+
+	return router
 }
