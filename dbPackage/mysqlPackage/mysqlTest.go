@@ -10,6 +10,10 @@ import (
 
 /*
 	go 和 mysql 中的 事件类型和bool 类型可以相互转换
+
+	DB.Exec(): 执行不返回 row 的命令, 比如: delete update insert 等; 可以单独执行, 也可以 prepare 预处理后再执行
+	DB.Query() DB.QueryRow: 用于查询一行或多行, prepare 后的 stmt 也可以执行 query
+
 */
 
 /*
@@ -81,6 +85,29 @@ func query() {
 		user := UserInfo{}
 		rows.Scan(&user.Id, &user.Username, &t, &n) // 和 query 一一对应,最好不要用 *
 		fmt.Println(n)
+	}
+}
+
+// --------------------------事物 tx
+func tx() {
+	tx, _ := DB.Begin()
+
+	ret, _ := tx.Exec("update myTable set price = price + 1 where id = ?", 1)
+	ret1, _ := tx.Exec("update myTable set price = price + 1 where id = ?", 2)
+
+	upd_num1, _ := ret.RowsAffected()
+	upd_num2, _ := ret1.RowsAffected()
+
+	if upd_num1 > 0 && upd_num2 > 0 {
+
+		//只有两条更新同时成功，Begin与Commit配对，才会提交
+		tx.Commit()
+		fmt.Println("Success")
+	} else {
+
+		//否则回滚到Begin，提高了安全性
+		tx.Rollback()
+		fmt.Println("Fail")
 	}
 }
 
