@@ -35,15 +35,17 @@ func Insert(u *models.User) error {
 		return err
 	}
 
-	// v, err := redis.Values(Conn.Do("HGETALL", strconv.Itoa(u.Id)))  // 获取所有值
+	// v, err := redis.Values(Conn.Do("HGETALL", strconv.Itoa(u.Id))) // 获取所有值
 	// if err != nil {
 	// 	return err
 	// }
 	// fmt.Println(reflect.TypeOf(v), v)
 
-	// var uu models.User // 如果这里加 *, 那么 uu 将是 nil
-	// err = redis.ScanStruct(v, &uu)  // 将上面的值,转换为 go 的 struct
-	// fmt.Printf("uu:%v", uu)
+	// uu := new(models.User)        // 如果 var uu *models.User, 那么 uu 将是 nil
+	// err = redis.ScanStruct(v, uu) // 将上面的值,转换为 go 的 struct
+	// fmt.Println("err :", err)
+	// fmt.Println(uu)
+	// fmt.Printf("uu:%+v", &uu)
 
 	return err
 }
