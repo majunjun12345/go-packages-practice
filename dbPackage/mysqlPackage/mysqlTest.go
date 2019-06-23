@@ -14,6 +14,8 @@ import (
 	DB.Exec(): 执行不返回 row 的命令, 比如: delete update insert 等; 可以单独执行, 也可以 prepare 预处理后再执行
 	DB.Query() DB.QueryRow: 用于查询一行或多行, prepare 后的 stmt 也可以执行 query
 
+	每个执行操作 (query queryRow等) 在并发时都是独立的连接,但是包裹在事物里面的是一个连接,里面所有的操作都是串行执行;
+
 */
 
 /*
