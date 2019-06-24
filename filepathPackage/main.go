@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
 )
@@ -17,7 +18,9 @@ func main() {
 	// pathPackage()
 
 	//url
-	urlPath()
+	// urlPath()
+
+	filepathPackage1()
 }
 
 func urlPath() {
@@ -89,4 +92,18 @@ func filepathPackage() {
 		return nil
 	})
 	fmt.Println(err)
+}
+
+func filepathPackage1() {
+
+	/*
+		这些命令编译后和编译前执行的结果不一样
+	*/
+	fmt.Println(filepath.Abs(filepath.Dir(os.Args[0])))
+
+	fmt.Println(filepath.Abs("./"))
+
+	fmt.Println(exec.LookPath(os.Args[0])) // 和上面一样，执行程序的路径
+
+	fmt.Println(os.Getwd()) // 相当于 pwd
 }

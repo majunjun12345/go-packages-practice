@@ -27,6 +27,9 @@ func main() {
 	fileinfos, err := ioutil.ReadDir("../")
 	CheckErr(err)
 	for _, fi := range fileinfos {
+		if fi.IsDir() {
+			continue
+		}
 		fmt.Println(fi.Name())
 	}
 

@@ -45,3 +45,6 @@ func CheckErr(err error) {
 		panic(err)
 	}
 }
+
+// os.IsPermission 判断文件读写权限
+// os.IsExist 判断问价是否存在
