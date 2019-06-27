@@ -9,6 +9,8 @@ import (
 /*
 	再次调用 once 方法将会被忽略掉，不会报错
 	无论 once 里面的方法更换与否，都只会执行一次 once.do 函数
+
+	一般用于给全局变量赋值，特别是读取配置文件的时候
 */
 var once *sync.Once = &sync.Once{}
 
