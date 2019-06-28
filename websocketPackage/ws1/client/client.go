@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"net/url"
+	"strconv"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -35,6 +36,8 @@ func main() {
 func timeWriter(conn *websocket.Conn) {
 	for {
 		time.Sleep(time.Second * 3)
-		conn.WriteMessage(websocket.TextMessage, []byte(time.Now().Format("2006-01-02 15:04:05")))
+		now := time.Now().Unix()
+		t := strconv.Itoa(int(now))
+		conn.WriteMessage(websocket.TextMessage, []byte(t))
 	}
 }

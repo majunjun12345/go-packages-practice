@@ -52,12 +52,7 @@ func (cm *ClientManager) start() {
 			}
 		case message := <-cm.broadcast:
 			for conn := range cm.clients {
-				select {
-				case conn.send <- message:
-					// default:
-					// 	close(conn.send)
-					// 	delete(cm.clients, conn)
-				}
+				conn.send <- message
 			}
 		}
 	}
@@ -73,34 +68,24 @@ func (cm *ClientManager) send(message []byte, client *Client) {
 }
 
 func (c *Client) read() {
-	// 是不是重复了
-	defer func() {
-		manager.unregister <- c
-		c.socket.Close()
-	}()
 	for {
 		_, message, err := c.socket.ReadMessage()
 		if err != nil {
 			manager.unregister <- c
 			c.socket.Close()
-			break
+			return
 		}
 		jsonMessage, _ := json.Marshal(&Message{Sender: c.id, Content: string(message)})
 		manager.broadcast <- jsonMessage
 	}
 }
 
+// write 和 client 中有一个关闭 conn 和 发送 unregister 就可以了
 func (c *Client) write() {
-	defer func() {
-		c.socket.Close()
-		close(c.send)
-	}()
-
 	for {
 		select {
 		case message, ok := <-c.send:
 			if !ok {
-				c.socket.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
 			c.socket.WriteMessage(websocket.TextMessage, message)
