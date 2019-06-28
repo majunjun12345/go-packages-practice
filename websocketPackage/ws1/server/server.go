@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/satori/go.uuid"
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	uuid "github.com/satori/go.uuid"
 
 	"github.com/gorilla/websocket"
 )
@@ -23,7 +24,7 @@ type ClientManager struct {
 }
 
 type Message struct {
-	Sender    string `json:"sender, omitempty"`
+	Sender    string `json:"sender, omitempty"` // 为空则不输出
 	Recipient string `json:"recipient, omitempty"`
 	Content   string `json:"content, omitempty"`
 }
@@ -116,19 +117,19 @@ func main() {
 }
 
 func wsPage(w http.ResponseWriter, r *http.Request) {
-	conn, err := (%websocket.Upgrader{CheckOrigin:func(r *http.Request) bool  {return true}}).Upgrade(w, r, nil)
-	
+	conn, err := (&websocket.Upgrader{CheckOrigin: func(r *http.Request) bool { return true }}).Upgrade(w, r, nil)
+
 	if err != nil {
 		http.NotFound(w, r)
 		return
 	}
 
-	uid , _:= uuid.NewV4()
+	uid, _ := uuid.NewV4()
 
 	client := &Client{
-		id:uid.String(),
-		socket:conn,
-		send:make(chan []byte),
+		id:     uid.String(),
+		socket: conn,
+		send:   make(chan []byte),
 	}
 	manager.register <- client
 
