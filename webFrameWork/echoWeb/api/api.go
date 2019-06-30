@@ -1,11 +1,11 @@
 package api
 
 import (
-	"echo/middleware"
 	"net/http"
-	"testGoScripts/webFrameWork/echoWeb/db"
+	"testGoScript/webFrameWork/echoWeb/db"
 
 	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 )
 
 func init() {
@@ -26,7 +26,8 @@ func StartServer() {
 		return c.JSON(http.StatusOK, map[string]string{"ping": "pong"})
 	})
 
-	e.GET("/", index)
+	e.GET("/", Index)
+	e.GET("/id/:id", GetUser)
 
 	e.Logger.Fatal(e.Start(":8081"))
 }

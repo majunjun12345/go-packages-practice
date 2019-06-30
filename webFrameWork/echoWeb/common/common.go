@@ -2,7 +2,7 @@ package common
 
 import "reflect"
 
-func Struct2Map(obj interface{}) map[string]interface{} {
+func Struct2Map(obj interface{}) map[string]interface{} { // obj 不能是地址
 	t := reflect.TypeOf(obj)
 	v := reflect.ValueOf(obj)
 
