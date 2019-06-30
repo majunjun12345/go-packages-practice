@@ -7,6 +7,10 @@ import (
 	"time"
 )
 
+/*
+	close(chan) 也往 chan 里面发送了信号,再加上一个 close 的功能;
+*/
+
 var ShutDown bool
 
 func main() {
@@ -15,13 +19,15 @@ func main() {
 
 	complete := make(chan struct{})
 	go LaunchProcessor(complete)
+
+	// 这是一个阻塞机制, 直到接收到信号, 通知协程退出
 	for {
 		select {
 		case <-sigChan:
 			fmt.Println("shutdown")
 			ShutDown = true
-		case <-complete:
-			fmt.Println("return")
+		case a, ok := <-complete: // 这里为什么能够收到信号?都没有向里面发送值
+			fmt.Println("return:", a, ok)
 			return
 		}
 	}
@@ -40,6 +46,7 @@ func LaunchProcessor(complete chan struct{}) {
 
 		if ShutDown {
 			fmt.Println("kill work")
+			complete <- struct{}{} // 这句可要可不要
 			return
 		}
 	}
