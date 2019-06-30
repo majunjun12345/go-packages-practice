@@ -3,7 +3,7 @@ package db
 import (
 	"database/sql"
 	"log"
-	"testGoScript/webFrameWork/echoWeb/models"
+	"testGoScripts/webFrameWork/echoWeb/models"
 
 	_ "github.com/lib/pq"
 )
