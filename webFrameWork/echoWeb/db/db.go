@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"testGoScripts/webFrameWork/echoWeb/models"
+	"testGoScript/webFrameWork/echoWeb/models"
 
 	_ "github.com/lib/pq"
 )

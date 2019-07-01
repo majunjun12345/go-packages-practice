@@ -1,8 +1,10 @@
 package api
 
 import (
+	"math/rand"
 	"net/http"
-	"testGoScripts/webFrameWork/echoWeb/db"
+	"testGoScript/webFrameWork/echoWeb/db"
+	"time"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -22,6 +24,7 @@ func StartServer() {
 		AllowOrigins: []string{"http://foo.com", "http://test.com"},
 		AllowMethods: []string{echo.GET, echo.PUT, echo.POST, echo.DELETE},
 	}))
+	e.Static("/", "static")
 
 	e.GET("/ping", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]string{"ping": "pong"})
@@ -56,9 +59,35 @@ func StartServer() {
 		return c.JSON(http.StatusOK, []string{"Joe", "Veer", "Zion"})
 	})
 
-	// e.Logger.Fatal(e.Start(":8081"))
+	// server pusher
+	e.GET("/api/pusher", func(c echo.Context) error {
+		pusher, ok := c.Response().Writer.(http.Pusher)
+
+		if ok {
+			if err := pusher.Push("/echo.jpeg", nil); err != nil {
+				return err
+			}
+
+		}
+		return c.File("static/index.html")
+	})
+
+	// jsonp 解决跨域问题
+	e.GET("/jsonp", func(c echo.Context) error {
+		callback := c.QueryParam("callback")
+		var content struct {
+			Response  string    `json:"response"`
+			Timestamp time.Time `json:"timestamp"`
+			Random    int       `json:"random"`
+		}
+		content.Response = "Sent via JSONP"
+		content.Timestamp = time.Now().UTC()
+		content.Random = rand.Intn(1000)
+		return c.JSONP(http.StatusOK, callback, &content)
+	})
+
+	//使用 https and http/2.0
 	/*
-		使用 https
 		curl -k -i https://localhost:8081/api/users 必带参数：-k
 
 		HTTP/2 200
@@ -71,5 +100,8 @@ func StartServer() {
 		["Joe","Veer","Zion"]
 
 	*/
-	e.Logger.Fatal(e.StartTLS(":8081", "pem/cert.pem", "pem/key.pem"))
+
+	// e.Logger.Fatal(e.StartTLS(":8081", "pem/cert.pem", "pem/key.pem"))
+	e.Logger.Fatal(e.Start(":8081"))
+
 }
