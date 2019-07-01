@@ -2,8 +2,8 @@ package api
 
 import (
 	"net/http"
-	"testGoScript/webFrameWork/echoWeb/common"
-	"testGoScript/webFrameWork/echoWeb/core"
+	"testGoScripts/webFrameWork/echoWeb/common"
+	"testGoScripts/webFrameWork/echoWeb/core"
 
 	"github.com/labstack/echo"
 )
