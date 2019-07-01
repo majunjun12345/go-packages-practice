@@ -9,6 +9,14 @@ import (
 
 /*
 	close(chan) 也往 chan 里面发送了信号,再加上一个 close 的功能;
+
+	这里为什么使用 空结构体 {} 呢?
+	1. map 较长,浪费资源
+	2. 表明这里不需要传值
+
+	空结构体的声明赋值方式:
+	声明: chan struct{}
+	赋值: complete <- struct{}{}
 */
 
 var ShutDown bool
@@ -46,7 +54,7 @@ func LaunchProcessor(complete chan struct{}) {
 
 		if ShutDown {
 			fmt.Println("kill work")
-			complete <- struct{}{} // 这句可要可不要
+			// complete <- struct{}{} // 这句可要可不要
 			return
 		}
 	}
