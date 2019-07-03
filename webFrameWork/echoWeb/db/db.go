@@ -2,14 +2,11 @@ package db
 
 import (
 	"database/sql"
-	"echo"
 	"fmt"
 	"log"
-	"testGoScripts/webFrameWork/echoWeb/db"
 	"testGoScripts/webFrameWork/echoWeb/models"
 
 	_ "github.com/lib/pq"
-	"gopkg.in/mgo.v2"
 )
 
 /*
@@ -75,33 +72,3 @@ func GetUserByID(id string) (*models.Excuse, error) {
 }
 
 // -------------------------------------------- 使用 mgo
-
-type (
-	Handler struct {
-		DB *mgo.Session
-	}
-)
-
-var DBH *Handler
-
-func InitMgoDB() {
-	session, err := mgo.Dial("localhost:27017")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if err := session.Copy().DB("twitter").C("users").EnsureIndex(mgo.Index{
-		Key:    []string{"email"},
-		Unique: true,
-	}); err != nil {
-		log.Fatal(err)
-	}
-
-	DBH = &Handler{
-		DB: session,
-	}
-}
-
-func (h *db.Handler) SignUp(c echo.Context) error {
-	return nil
-}
