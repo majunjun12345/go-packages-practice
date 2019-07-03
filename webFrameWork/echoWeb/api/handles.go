@@ -2,8 +2,9 @@ package api
 
 import (
 	"net/http"
-	"testGoScript/webFrameWork/echoWeb/common"
-	"testGoScript/webFrameWork/echoWeb/core"
+	"testGoScripts/webFrameWork/echoWeb/common"
+	"testGoScripts/webFrameWork/echoWeb/core"
+	"testGoScripts/webFrameWork/echoWeb/db"
 
 	"github.com/labstack/echo"
 )
@@ -31,4 +32,15 @@ func GetUser(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"data": result,
 	})
+}
+
+// -------------------------- mgo
+// ---------user
+const (
+	// Key (Should come from somewhere else).
+	Key = "secret"
+)
+
+func (h *db.Handler) SignUp(c echo.Context) error {
+	return nil
 }

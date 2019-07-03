@@ -3,7 +3,7 @@ package api
 import (
 	"math/rand"
 	"net/http"
-	"testGoScript/webFrameWork/echoWeb/db"
+	"testGoScripts/webFrameWork/echoWeb/db"
 	"time"
 
 	"github.com/labstack/echo"

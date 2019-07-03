@@ -1,8 +1,8 @@
 package core
 
 import (
-	"testGoScript/webFrameWork/echoWeb/db"
-	"testGoScript/webFrameWork/echoWeb/models"
+	"testGoScripts/webFrameWork/echoWeb/db"
+	"testGoScripts/webFrameWork/echoWeb/models"
 )
 
 func GetOneUser() (*models.Excuse, error) {
