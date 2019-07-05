@@ -3,13 +3,14 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"runtime"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
 /*
-	go 和 mysql 中的 事件类型和bool 类型可以相互转换
+	go 和 mysql 中的 时间类型和bool 类型可以相互转换，设置 parseTime=true
 
 	DB.Exec(): 执行不返回 row 的命令, 比如: delete update insert 等; 可以单独执行, 也可以 prepare 预处理后再执行
 	DB.Query() DB.QueryRow: 用于查询一行或多行, prepare 后的 stmt 也可以执行 query
@@ -51,7 +52,7 @@ func init() {
 func main() {
 	// insert()
 
-	// query()
+	query()
 }
 
 // --------------------------insert
@@ -85,9 +86,47 @@ func query() {
 	var n int
 	for rows.Next() {
 		user := UserInfo{}
-		rows.Scan(&user.Id, &user.Username, &t, &n) // 和 query 一一对应,最好不要用 *
+		// 参数绑定需要进行错误处理
+		if err := rows.Scan(&user.Id, &user.Username, &t, &n); err != nil { // 和 query 一一对应,最好不要用 *
+			fmt.Println(err)
+			continue // 如果有错误，则忽略这条记录
+		}
 		fmt.Println(n)
 	}
+	if err := rows.Err(); err != nil { // 再次进行判断，遍历过程中是否有错误产生
+		fmt.Println(err)
+	}
+
+	// 查询单条记录
+	var username string
+	row := DB.QueryRow("select userna from userinfo where id=?", 3)
+	err = row.Scan(&username)
+	switch {
+	case err == sql.ErrNoRows: // 查询单条数据可能出现没有该条记录的错误，需要单独处理
+		fmt.Println("no such data")
+	case err != nil:
+		if _, file, line, ok := runtime.Caller(3); ok { // // 使用该方式可以打印出运行时的错误信息, 该种错误是编译时无法确定的
+			fmt.Println(err, file, line)
+		}
+	}
+
+	// 关于 null
+	// 所有查询出来的字段都不允许有NULL, 避免该方式最好的办法就是建表字段时, 不要设置类似DEFAULT NULL属性
+	// 下面这种语句可以避免 null，不过 having 一般和 group by 搭配使用，相当于 where 后面的条件语句；
+	var id int32
+	err = DB.QueryRow(`
+        SELECT
+            SUM(id) id
+        FROM userinfo
+        WHERE id = ?
+        HAVING id <> NULL
+    `, 10).Scan(&id)
+	switch {
+	case err == sql.ErrNoRows:
+	case err != nil:
+		fmt.Println(err)
+	}
+	fmt.Println(id)
 }
 
 // --------------------------事物 tx

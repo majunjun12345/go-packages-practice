@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"runtime"
 	"runtime/debug"
 )
 
@@ -25,9 +26,9 @@ func (he *HttpError) Error() string {
 }
 
 func main() {
-	// errTest()
+	errTest()
 
-	panicTest()
+	// panicTest()
 }
 
 // err
@@ -40,6 +41,13 @@ func errTest() {
 
 	er := errors.New("internal server error")
 	fmt.Println(er)
+
+	// 可以打印出错误发生的文件和行号
+	if er != nil {
+		if _, file, line, ok := runtime.Caller(0); ok { // 0 表示调用层级，0，1 显示的是自己的，2 和 3 为包级别
+			fmt.Println(file, line, ok) // /Users/majun/go/src/testGoScripts/errorPanicRecovery/main.go 46 true
+		}
+	}
 }
 
 // defer panic recovery
