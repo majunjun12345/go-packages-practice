@@ -29,7 +29,9 @@ import (
 func main() {
 	// testBufChan()
 
-	testNilChan()
+	// testNilChan()
+	// Add()
+	add()
 }
 
 /*
