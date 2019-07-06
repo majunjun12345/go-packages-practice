@@ -12,7 +12,11 @@ func main() {
 	// 	fmt.Println(er)
 	// }
 	// fmt.Println(string(url))
-	t := time.Now()
+
+	t := time.Now().AddDate(0, -3, 0)
 	verifyTime1 := t.Format("2006.01.02")
 	fmt.Println(verifyTime1)
+
+	var t1 int64 = 1562337405
+	fmt.Println(time.Unix(t1, 0).Format("2006.01.02"))
 }

@@ -20,6 +20,18 @@ import (
 */
 
 /*
+	程序连接数据库会有连接泄漏的情况，需要及时释放连接
+
+	Go sql包中的Query和QueryRow两个方法的连接不会自动释放连接，只有在遍历完结果或者调用close方法才会关闭连接
+
+	Go sql中的Ping和Exec方法在调用结束以后就会自动释放连接, scan 之后也会释放连接
+
+	忽略了函数的某个返回值不代表这个值就不存在了，如果该返回值需要close才会释放资源，直接忽略了就会导致资源的泄漏。
+
+	有close方法的变量，在使用后要及时调用该方法，释放资源
+*/
+
+/*
 	DROP TABLE IF EXISTS `userinfo`;
 	CREATE TABLE `userinfo` (
 		`id` INT(10) NOT NULL AUTO_INCREMENT,
@@ -40,7 +52,7 @@ type UserInfo struct {
 var DB *sql.DB
 
 func init() {
-	db, err := sql.Open("mysql", "root:123456@tcp(127.0.0.1:3306)/goTest?charset=utf8")
+	db, err := sql.Open("mysql", "root:123456@tcp(127.0.0.1:3306)/goTest?charset=utf8&parseTime=true")
 	// defer db.Close()
 	CheckErr(err)
 	DB = db
