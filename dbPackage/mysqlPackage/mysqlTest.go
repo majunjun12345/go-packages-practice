@@ -10,6 +10,18 @@ import (
 )
 
 /*
+	https://medium.com/impopper-engineering/go-concurrency-query-in-mysql-transactions-f6018c7b16b2
+	执行 query 语句获取 rows，数据还在 buffer 里面没有读出来，用 for rows.Next(){rows1.Scan()} 可以将数据读出来（next取出buffer内数据，scan绑定数据），清空 buffer，close 也可以；
+	一个事物维持一个连接，如果在读出来之前执行另一个 query 操作，会导致 busy buffer
+
+	每个 sql 语句都对应一个 buffer，执行结果存储在里面，一个事物离只会有一个 连接实例，
+	也就是在一个事物里如果有多个 query 语句，每执行一个 query 语句后必须清空 buffer
+
+	query 和 exec 语句的不同：
+		在一个事物中可以并发的执行更新或插入操作，因为更新或插入调用的是 exec，db 返回的 result 直接从 buffer 里面取出来了；
+*/
+
+/*
 	go 和 mysql 中的 时间类型和bool 类型可以相互转换，设置 parseTime=true
 
 	DB.Exec(): 执行不返回 row 的命令, 比如: delete update insert 等; 可以单独执行, 也可以 prepare 预处理后再执行
@@ -32,11 +44,11 @@ import (
 */
 
 /*
-	DROP TABLE IF EXISTS `userinfo`;
-	CREATE TABLE `userinfo` (
+	DROP TABLE IF EXISTS `user`;
+	CREATE TABLE `user` (
 		`id` INT(10) NOT NULL AUTO_INCREMENT,
-		`username` VARCHAR(64) NULL DEFAULT NULL,
-		`created` DATETIME NULL DEFAULT NULL,
+		`username` VARCHAR(64) NULL DEFAULT "majun",
+		`created` DATETIME NULL DEFAULT "1990-09-28 06:15:15",
 		`married` BOOLEAN NOT NULL DEFAULT TRUE,
 		PRIMARY KEY (`id`)
 	);
@@ -64,10 +76,12 @@ func init() {
 func main() {
 	// insert()
 
-	query()
+	// query()
+
+	tx()
 }
 
-// --------------------------insert
+// --------------------------insert exec 主要是执行插入和更新操作
 // 两种插入方式
 func insert() {
 	stmt, err := DB.Prepare("INSERT userinfo set username=?, created=?, married=?")
@@ -78,19 +92,17 @@ func insert() {
 	DB.Exec("INSERT userinfo set username=?, created=?, married=?", "memglima", GetTime(), false)
 }
 
-// --------------------------query
+// --------------------------query 主要是执行 查询 操作
 func query() {
 	/*
 		返回的 row 必须使用 scan，不然会导致连接无法关闭，一直处于连接状态
-		query 语句会建立一次连接，使用 scan 后会断开连接   https://www.jianshu.com/p/06f26f879d61
+		query 语句会建立一次连接，使用 next scan 后清空的是 buffer 并不是关闭连接   https://www.jianshu.com/p/06f26f879d61
+		rows.close 才是关闭的连接
 		* 也可以替换为具体的查询字段
 	*/
-	rows, err := DB.Query("select * from userinfo") // QueryRow 查询一行
-	defer func() {
-		if rows != nil {
-			rows.Close() //可以关闭掉未scan连接一直占用
-		}
-	}()
+	rows, err := DB.Query("select id , username, created, married from userinfo") // QueryRow 查询一行
+	defer rows.Close()                                                            // 这里才是关闭 query 的连接
+
 	if err != nil {
 		panic(err)
 	}
@@ -142,16 +154,14 @@ func query() {
 }
 
 // --------------------------事物 tx
-func tx() {
+func tx() { //这里没有清空 buffer，但是也没有报错，就有点不懂了
 	tx, _ := DB.Begin()
+	_, err1 := DB.Query("select id , username, created, married from user")
 
-	ret, _ := tx.Exec("update myTable set price = price + 1 where id = ?", 1)
-	ret1, _ := tx.Exec("update myTable set price = price + 1 where id = ?", 2)
+	stmt, err3 := DB.Prepare("INSERT userinfo set username=?, created=?, married=?")
+	_, err4 := stmt.Exec("memglima", GetTime(), false)
 
-	upd_num1, _ := ret.RowsAffected()
-	upd_num2, _ := ret1.RowsAffected()
-
-	if upd_num1 > 0 && upd_num2 > 0 {
+	if err1 == nil && err3 == nil && err4 == nil {
 
 		//只有两条更新同时成功，Begin与Commit配对，才会提交
 		tx.Commit()
@@ -160,8 +170,27 @@ func tx() {
 
 		//否则回滚到Begin，提高了安全性
 		tx.Rollback()
+		fmt.Println(err1)
 		fmt.Println("Fail")
 	}
+
+	// ret, _ := tx.Exec("update user set username = hahaha where id = ?", 1)
+	// ret1, _ := tx.Exec("update user set username = masanqi where id = ?", 2)
+
+	// upd_num1, _ := ret.RowsAffected()
+	// upd_num2, _ := ret1.RowsAffected()
+
+	// if upd_num1 > 0 && upd_num2 > 0 {
+
+	// 	//只有两条更新同时成功，Begin与Commit配对，才会提交
+	// 	tx.Commit()
+	// 	fmt.Println("Success")
+	// } else {
+
+	// 	//否则回滚到Begin，提高了安全性
+	// 	tx.Rollback()
+	// 	fmt.Println("Fail")
+	// }
 }
 
 func GetTime() string {
