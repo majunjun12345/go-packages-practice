@@ -12,6 +12,7 @@ import (
 
 func init() {
 	db.Init()
+	InitMgoDB()
 }
 
 func StartServer() {
@@ -85,6 +86,12 @@ func StartServer() {
 		content.Random = rand.Intn(1000)
 		return c.JSONP(http.StatusOK, callback, &content)
 	})
+
+	// --------------------mgo
+	e.POST("/signup", DBH.SignUp)
+	e.POST("/login", DBH.Login)
+	e.POST("/follow/:id", DBH.Follow)
+	// --------------------mgo
 
 	//使用 https and http/2.0
 	/*

@@ -1,6 +1,6 @@
 package main
 
-import "testGoScript/webFrameWork/echoWeb/api"
+import "testGoScripts/webFrameWork/echoWeb/api"
 
 func main() {
 	api.StartServer()
