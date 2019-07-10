@@ -7,7 +7,10 @@ import (
 
 func main() {
 	// base()
-	structSort()
+
+	// structSort()
+
+	structSort2()
 }
 
 // 基本类型的排序
@@ -26,7 +29,7 @@ func base() {
 
 	// 降序
 	sort.Sort(sort.Reverse(sort.IntSlice(intList)))
-	sort.Sort(sort.Reverse(sort.Float64Slice(float8List)))
+	sort.Stable(sort.Reverse(sort.Float64Slice(float8List))) // stable：排序前后相同的元素位置不变
 	sort.Sort(sort.Reverse(sort.StringSlice(stringList)))
 	fmt.Println(intList)
 	fmt.Println(float8List)
@@ -42,7 +45,7 @@ type PersonSlice []Person
 
 func (a PersonSlice) Len() int           { return len(a) }
 func (a PersonSlice) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a PersonSlice) Less(i, j int) bool { return a[i].Age < a[j].Age }
+func (a PersonSlice) Less(i, j int) bool { return a[i].Age < a[j].Age } // > 是降序
 
 func structSort() {
 	people := []Person{
@@ -59,4 +62,17 @@ func structSort() {
 	// 降序排列
 	sort.Sort(sort.Reverse(PersonSlice(people)))
 	fmt.Println(people)
+}
+
+// 结构体直接排序
+func structSort2() {
+	data := []Person{
+		{"Alice", 20},
+		{"Bob", 15},
+		{"Jane", 30},
+	}
+	sort.Slice(data, func(i, j int) bool {
+		return data[i].Age > data[j].Age
+	})
+	fmt.Println(data)
 }
