@@ -8,19 +8,27 @@ go test 的函数顺序执行
 
     测试命令:
         go test -v xxx_test.go: 测试整个文件
-        go test -v xxx_test.go -test.run TestInsert: 测试文件中的某个函数
+        go test -v -test.run TestBubble: 测试文件中的某个函数
         -v: 显示详细信息，可以打印内容
+
+表组测试：
+    见详细例子
 
 基准测试:运行性能及耗费 CPU 的程度
     测试函数以 Benchmark 开头, 唯一参数: b *testing.B
 
     测试命令:
-        go test -bench=. xxx_test.go: 表示执行该文件的全部压力测试函数, 加上 -v 就会执行单元测试
+        go test -bench=. : 表示执行该文件的全部压力测试函数, 加上 -v 就会执行单元测试
+        go test -bench=. -test.run BenchmarkBubble：测试某一个函数
+        -count=5：执行次数
         -bench=.: 表示运行 xxx_test.go 文件中的所有基准测试
         -bench=BenchmarkInsert: 指定测试函数
         b.N=20000: 来设置压力次数
         -cpu=1,2,4,8: 控制 cpu 执行核数
         -benchmem: 显示内存分配情况
+            ns/op-nanosecond/operation 即执行一次操作消耗的时间。52.0 ns/op即平均每执行一次操作消耗0.052毫秒
+            B/op 平均每次操作需要占用的内存空间（字节）
+            allocs/op 平均每次操作需要分配内次的次数
         -benchtime=5s: 控制执行时长
             基准测试的单次执行时间默认是 1s，如果函数执行时长未超过 1s，则会在 1s 内尽可能多的执行测试函数；
 
