@@ -1,13 +1,12 @@
 package api
 
 import (
+	"echo"
+	"echo/middleware"
 	"math/rand"
 	"net/http"
 	"testGoScripts/webFrameWork/echoWeb/db"
 	"time"
-
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
 )
 
 func init() {
