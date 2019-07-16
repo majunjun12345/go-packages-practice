@@ -85,17 +85,13 @@ func TimeChan() {
 
 func removePreDirs() {
 	tickChan := time.Tick(time.Second * 3)
-	for {
-		select {
-		case <-tickChan:
-			fileInfos, _ := ioutil.ReadDir("images")
-			if len(fileInfos) >= 2 {
-				dirName := filepath.Join("images", fileInfos[0].Name())
-				fmt.Println("remove dir:", dirName)
-				os.RemoveAll(dirName)
-			}
-			fmt.Println("tick")
-		default:
+	for range tickChan {
+		fileInfos, _ := ioutil.ReadDir("images")
+		if len(fileInfos) >= 2 {
+			dirName := filepath.Join("images", fileInfos[0].Name())
+			fmt.Println("remove dir:", dirName)
+			os.RemoveAll(dirName)
 		}
+		fmt.Println("tick")
 	}
 }
