@@ -78,7 +78,9 @@ func main() {
 
 	// query()
 
-	tx()
+	// tx()
+
+	QueryNoRows()
 }
 
 // --------------------------insert exec 主要是执行插入和更新操作
@@ -151,6 +153,28 @@ func query() {
 		fmt.Println(err)
 	}
 	fmt.Println(id)
+}
+
+func QueryNoRows() {
+	// 查询 row 为空，scan 返回对象的零值，err 为 sql.ErrNoRows
+	user := UserInfo{}
+	row := DB.QueryRow("select id , username, created, married from userinfo where id=?", 4)
+	err := row.Scan(&user.Id, &user.Username, &user.CreatedTime, &user.Married)
+	fmt.Println(user)
+	fmt.Printf("err0:%v\n", err)
+	fmt.Println(err == sql.ErrNoRows)
+
+	// 为空，不会报错，
+	stmt, err := DB.Prepare("select id , username, created, married from userinfo where id=?")
+	if err != nil {
+		fmt.Printf("err1:%v\n", err)
+	}
+	res, err := stmt.Exec(4)
+	if err != nil {
+		fmt.Printf("err2:%v\n", err)
+	}
+
+	fmt.Println(res.RowsAffected()) // 0
 }
 
 // --------------------------事物 tx
