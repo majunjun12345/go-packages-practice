@@ -29,9 +29,50 @@ var (
 )
 
 func main() {
-	Example()
+	// Example()
+
+	// testHmsetHash()
+
+	testHmgetHash()
 }
 
+// -----------------------hash
+func testHmgetHash() {
+	rConn := RedisClient.Get()
+	defer rConn.Close() // 放回连接池
+
+	data, err := redis.Values(rConn.Do("hgetall", "menglima"))
+	if err != nil {
+		fmt.Println(err)
+	}
+	for i := 0; i < len(data); i += 2 { // 这样获取的全是 key
+		fmt.Println(string(data[i].([]byte))) // 还要进行断言成 字节数组
+		fmt.Println(string(data[i+1].([]byte)))
+	}
+}
+
+func testHmsetHash() {
+	var p1 struct {
+		Title  string `redis:"title"`
+		Author string `redis:"author"`
+		Body   string `redis:"body"`
+	}
+
+	p1.Title = "Example"
+	p1.Author = "Gary"
+	p1.Body = "Hello"
+
+	rConn := RedisClient.Get()
+	defer rConn.Close() // 放回连接池
+
+	_, err := rConn.Do("HMSET", redis.Args{}.Add("menglima").AddFlat(&p1)...)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return
+}
+
+// -----------------------pool
 func Example() {
 	rConn := RedisClient.Get()
 	defer rConn.Close() // 放回连接池
