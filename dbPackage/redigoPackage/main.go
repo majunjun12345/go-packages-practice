@@ -76,6 +76,12 @@ func testHmsetHash() {
 func Example() {
 	rConn := RedisClient.Get()
 	defer rConn.Close() // 放回连接池
+
+	// err 这样就把连接池关了
+	// rConn1 := RedisClient
+	// defer rConn1.Close()
+	// rConn1.Get() ...
+
 	resp, err := rConn.Do("PING")
 	fmt.Println(resp, err)
 }
