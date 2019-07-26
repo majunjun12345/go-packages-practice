@@ -1,5 +1,6 @@
 
 https 通信流程：
+好文：https://www.kuacg.com/22672.html
 
 ![image.png](https://uploadfiles.nowcoder.com/images/20190413/420034185_1555134777188_4C843633D9B517514370FC7FEF715116)
 
