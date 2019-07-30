@@ -23,16 +23,17 @@ var (
 )
 
 func main() {
-	switch kingpin.Parse() {
-	case "gzipServer":
-		fmt.Println(*compressToGzip)
-		if *compressToGzip {
-			Compress(*srcDir, *descFile)
-		}
-	case "decompressServer":
-		decompress(*srcFile, *decompressDir)
-	default:
-	}
+	// switch kingpin.Parse() {
+	// case "gzipServer":
+	// 	fmt.Println(*compressToGzip)
+	// 	if *compressToGzip {
+	// 		Compress(*srcDir, *descFile)
+	// 	}
+	// case "decompressServer":
+	// 	decompress(*srcFile, *decompressDir)
+	// default:
+	// }
+	Compress("images", "images.tar")
 }
 
 // 归档但不压缩
@@ -41,12 +42,12 @@ func Compress(src, desc string) {
 	tarFile, err := os.Create(desc)
 	defer tarFile.Close()
 
-	// gzip 压缩
-	gWrite := gzip.NewWriter(tarFile)
-	defer gWrite.Close()
+	// // gzip 压缩
+	// gWrite := gzip.NewWriter(tarFile)
+	// defer gWrite.Close()
 
 	checkErr(err)
-	tarWrite := tar.NewWriter(gWrite)
+	tarWrite := tar.NewWriter(tarFile)
 
 	// 如果关闭失败会造成tar包不完整，所以必须监测
 	defer func() {
@@ -60,8 +61,14 @@ func Compress(src, desc string) {
 		if !info.IsDir() { // 文件夹没有 head 和 content
 			headerInfo, err := tar.FileInfoHeader(info, "")
 			checkErr(err)
-			headerInfo.Name, _ = filepath.Rel(filepath.Dir(src), path) // 相对路径，name 一定要改
-			fileContent, err := ioutil.ReadFile(path)                  // 打开文件并读取内容，是对 os.open 的封装，os.open() 只是打开文件但还需要额外读取数据
+
+			// 兼容 win 的 \
+			fpath, _ := filepath.Rel(src, path)
+			dir := filepath.Dir(fpath)
+			fileName := filepath.Base(fpath)
+			headerInfo.Name = dir + "/" + fileName // 相对路径，name 一定要改
+
+			fileContent, err := ioutil.ReadFile(path) // 打开文件并读取内容，是对 os.open 的封装，os.open() 只是打开文件但还需要额外读取数据
 			checkErr(err)
 			err = tarWrite.WriteHeader(headerInfo)
 			checkErr(err)
