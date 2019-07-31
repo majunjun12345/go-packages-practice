@@ -32,11 +32,28 @@ type Response2 struct {
 	desc   string   `json:desc`
 }
 
-func main() {
+type Feed struct {
+	Name string `json:"site"`
+	URI  string `json:"link"`
+	Type string `json:"type"`
+}
 
+type Message struct {
+	Name string
+	Text string
+}
+
+func main() {
+	// commonMarshal()
+	commonUnMarshal()
+	// decoder()
+}
+
+func commonMarshal() {
 	res1D := &Response1{
 		Page:   1,
-		Fruits: []string{"apple", "peach", "pear"}}
+		Fruits: []string{"apple", "peach", "pear"},
+	}
 	res1B, _ := json.Marshal(res1D)
 	fmt.Println(string(res1B))
 
@@ -47,10 +64,20 @@ func main() {
 	}
 	res2B, _ := json.Marshal(res2D)
 	fmt.Println(string(res2B))
+}
 
-	/*
-		decoder
-	*/
+// json 数组可以直接处理
+func commonUnMarshal() {
+	var m []Message
+	err := json.Unmarshal([]byte(jsonStream0), &m)
+	fmt.Println(err)
+	fmt.Printf("%+v\n", m)
+}
+
+/*
+	decoder
+*/
+func decoder() {
 	//  json 数组
 	newReader := strings.NewReader(jsonStream0)
 	decode := json.NewDecoder(newReader)
@@ -82,6 +109,20 @@ func main() {
 		fmt.Printf("%+v\n", m1)
 	}
 
+	// json 流 数组 不能这么搞
+	newReader2 := json.NewDecoder(strings.NewReader(jsonStream1))
+	var m2 []Message // 变量在 for 循环里面
+	for {
+
+		err = newReader2.Decode(&m2)
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			CheckErr(err)
+		}
+	}
+	fmt.Printf("%+v\n", m2)
+
 	// file 中读取
 	file, err := os.Open("test.json")
 	defer file.Close()
@@ -101,17 +142,6 @@ func main() {
 	// }
 	// tt, _ = r.Token()
 	// fmt.Println(tt)
-}
-
-type Feed struct {
-	Name string `json:"site"`
-	URI  string `json:"link"`
-	Type string `json:"type"`
-}
-
-type Message struct {
-	Name string
-	Text string
 }
 
 const jsonStream0 = `
