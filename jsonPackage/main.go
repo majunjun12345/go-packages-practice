@@ -20,6 +20,11 @@ import (
 		json.Decoder会一个一个元素进行加载，不会把整个json数组读到内存里面
 		如果使用 token(必须是数组)，需要建立 for 循环，读出的是 struct 对象
 		如果不使用 token，不需要 for 循环，读出的是 struct 对象数组
+
+	json 和 map 也可以通过该包进行转换
+	json 转 map 的适合，虽然 map 本身就是引用类型，但还是要加上 & 取址
+
+	map 与 struct 互转需要用到第三方库 mapstructure
 */
 
 type Response1 struct {
@@ -45,8 +50,10 @@ type Message struct {
 
 func main() {
 	// commonMarshal()
-	commonUnMarshal()
+	// commonUnMarshal()
 	// decoder()
+	json2Map()
+	map2Json()
 }
 
 func commonMarshal() {
@@ -166,4 +173,34 @@ func CheckErr(err error) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+// ----------------- json ---- map
+
+func json2Map() {
+	jsonStr := `
+	{
+			"name": "jqw",
+			"age": 18
+	}
+`
+	var mapResult map[string]interface{}
+	err := json.Unmarshal([]byte(jsonStr), &mapResult) // 需要引用类型
+	fmt.Println(err)
+	fmt.Println(mapResult)
+}
+
+func map2Json() {
+	mapInstances := []map[string]interface{}{}
+	instance_1 := map[string]interface{}{"name": "John", "age": 10}
+	instance_2 := map[string]interface{}{"name": "Alex", "age": 12}
+	mapInstances = append(mapInstances, instance_1, instance_2)
+
+	jsonData, err := json.Marshal(instance_1)
+	fmt.Println(err)
+	fmt.Println(jsonData)
+
+	jsonDataList, err := json.Marshal(mapInstances)
+	fmt.Println(err)
+	fmt.Println(jsonDataList)
 }
