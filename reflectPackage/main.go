@@ -26,8 +26,10 @@ func main() {
 	// var s string = "mamengli"
 	// TString(s)
 
-	u := User{"mengliam", 21, false}
-	TStruct(u)
+	// u := User{"mengliam", 21, false}
+	// TStruct(u)
+
+	main1()
 }
 
 // 获取简单对象的类型和值
@@ -59,4 +61,63 @@ func TStruct(s interface{}) {
 		fmt.Println(m.Name, m.Type)
 	}
 
+	m := v.MethodByName("hello")
+	params := make([]reflect.Value, 1)
+	fmt.Println(m.Call(params))
+}
+
+// 通过反射调用结构体的方法
+func main1() {
+	//通过反射的方式调用结构体类型的方法
+	var setNameStr string = "SetName"
+	var addAgeStr string = "AddAge"
+	user := UserInfo{
+		Id:   1,
+		Name: "env107",
+		Age:  18,
+	}
+	//1.获取到结构体类型变量的反射类型
+	refUser := reflect.ValueOf(&user) //需要传入指针，后面再解析
+	fmt.Println(refUser)
+	//2.获取确切的方法名
+	//带参数调用方式
+	setNameMethod := refUser.MethodByName(setNameStr)
+	args := []reflect.Value{reflect.ValueOf("Mike")} //构造一个类型为reflect.Value的切片
+	setNameMethod.Call(args)                         //返回Value类型
+	//不带参数调用方式
+	addAgeMethod := refUser.MethodByName(addAgeStr)
+	addAgeMethod.Call(make([]reflect.Value, 0))
+
+	fmt.Println("User.Name = ", user.Name)
+	fmt.Println("User.Age = ", user.Age)
+
+}
+
+type UserInfo struct {
+	Id   int
+	Name string
+	Age  int
+}
+
+//ToString方法
+func (u UserInfo) String() string {
+	return "User[ Id " + string(u.Id) + "]"
+}
+
+//设置Name方法
+func (u *UserInfo) SetName(name string) string {
+	oldName := u.Name
+	u.Name = name
+	return oldName
+}
+
+//年龄数+1
+func (u *UserInfo) AddAge() bool {
+	u.Age++
+	return true
+}
+
+//测试方法
+func (u UserInfo) TestUser() {
+	fmt.Println("我只是输出某些内容而已....")
 }

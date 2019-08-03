@@ -9,7 +9,7 @@ import (
 )
 
 /*
-	最快的 json 计时器
+	最快的 json 解释器
 */
 
 type Person struct {
