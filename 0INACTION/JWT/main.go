@@ -47,6 +47,15 @@ import (
 		Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NjA0OTI4MTgsImlhdCI6MTU2MDQ4OTIxOH0.L8FgH3846II40WQnsWfzN7Dbdhdb2K9rYpA9bPNzjb8
 	服务端：
 		校验 token
+
+	优势：
+		jwt token 认证机制是对 session 认证机制的替代
+		session 存储于服务端，用户过多会造成服务器压力；
+		session 依赖 cookie，如果 cokkie 被截获，可能会造成 CSRF(跨站请求伪造)；
+		不适合做分布式场景；
+
+	当前脚本的校验直接通过 request.ParseFromRequest(),
+	其余的脚本都是通过 jwt 包自带的认证方式：jwt.ParseWithClaims
 */
 
 const (
@@ -79,23 +88,6 @@ type Token struct {
 	Token string `json:"token"`
 }
 
-func main() {
-	StartServer()
-}
-
-func StartServer() {
-
-	http.HandleFunc("/login", LoginHandler)
-
-	http.Handle("/resource", negroni.New(
-		negroni.HandlerFunc(ValidateTokenMiddleware),
-		negroni.Wrap(http.HandlerFunc(ProtectedHandler)),
-	))
-
-	log.Println("Now listening...")
-	http.ListenAndServe(":1234", nil)
-}
-
 func ProtectedHandler(w http.ResponseWriter, r *http.Request) {
 
 	response := Response{"Gained access to protected resource"}
@@ -124,12 +116,14 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// header + preload jwt.New() 使用默认 claims, NewWithClaims 使用自定义 claims
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := make(jwt.MapClaims)
 	claims["exp"] = time.Now().Add(time.Hour * time.Duration(1)).Unix()
 	claims["iat"] = time.Now().Unix()
 	token.Claims = claims
 
+	// header + preload + signedString
 	tokenString, err := token.SignedString([]byte(SecretKey))
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -184,4 +178,21 @@ func JsonResponse(response interface{}, w http.ResponseWriter) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(responseData)
+}
+
+func StartServer() {
+
+	http.HandleFunc("/login", LoginHandler)
+
+	http.Handle("/resource", negroni.New(
+		negroni.HandlerFunc(ValidateTokenMiddleware),
+		negroni.Wrap(http.HandlerFunc(ProtectedHandler)),
+	))
+
+	log.Println("Now listening...")
+	http.ListenAndServe(":1234", nil)
+}
+
+func main() {
+	StartServer()
 }
