@@ -50,7 +50,7 @@ import (
 */
 
 const (
-	SecretKey = "welcome to wangshubo's blog"
+	SecretKey = "welcome to menglima's blog"
 )
 
 func fatal(err error) {
@@ -129,12 +129,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	claims["exp"] = time.Now().Add(time.Hour * time.Duration(1)).Unix()
 	claims["iat"] = time.Now().Unix()
 	token.Claims = claims
-
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintln(w, "Error extracting the key")
-		fatal(err)
-	}
 
 	tokenString, err := token.SignedString([]byte(SecretKey))
 	if err != nil {

@@ -12,6 +12,10 @@ func main() {
 
 func BasicUse() {
 
+	// join
+	new_s := strings.Join([]string{"zhangsan", "lisi"}, ".")
+	fmt.Println("=====:", new_s)
+
 	// to
 	s := "MengLiMa"
 	fmt.Println(strings.ToLower(s))
