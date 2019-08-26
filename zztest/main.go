@@ -11,7 +11,9 @@ import (
 func main() {
 	// test1()
 	// test2()
-	test3()
+	// test3()
+	// DefaultValueOfStruct()
+	t()
 }
 
 func test1() {
@@ -58,4 +60,22 @@ func test4() (u user) {
 	u.Age = 19
 	u.Name = "mamengli"
 	return
+}
+
+type Person struct {
+	Name string `defaultValue:"mengliam"`
+	Age  int    `defaultValue:"21"`
+}
+
+func DefaultValueOfStruct() {
+	p := Person{
+		Name: "mamengli",
+	}
+	fmt.Printf("info:%v", p)
+}
+
+// time.Time 的零值
+func t() {
+	t := time.Time{}
+	fmt.Println(t.IsZero())
 }

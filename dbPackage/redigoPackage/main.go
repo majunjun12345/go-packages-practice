@@ -115,7 +115,7 @@ func RedisPool() *redis.Pool {
 			}
 			return conn, nil
 		},
-		TestOnBorrow: func(c redis.Conn, t time.Time) error { // 没一分钟测试连接的可用状态
+		TestOnBorrow: func(c redis.Conn, t time.Time) error { // 每一分钟测试连接的可用状态
 			if time.Since(t) < time.Minute {
 				return nil
 			}
