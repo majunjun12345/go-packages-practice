@@ -1,10 +1,15 @@
 package main
 
 import (
+	"archive/tar"
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
+	"os"
+	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -13,7 +18,41 @@ func main() {
 	// test2()
 	// test3()
 	// DefaultValueOfStruct()
-	t()
+	// t()
+	// t1()
+	// ok := strings.HasSuffix("/Users/majun/sa6/test.tar", ".tar")
+	// fmt.Println(ok)
+	testTar("test.tar")
+}
+
+func testTar(fpath string) {
+	f, err := os.Open(fpath)
+	if err != nil {
+		fmt.Println("11111err:", err)
+	}
+	defer f.Close()
+	tarRead := tar.NewReader(f)
+	for {
+		header, err := tarRead.Next()
+
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			fmt.Printf("ERROR: cannot read tar file, error=[%v]\n", err)
+			return
+		}
+		if header.FileInfo().IsDir() {
+			continue
+		}
+		if strings.HasPrefix(filepath.Base(header.Name), ".") {
+			continue
+		}
+	}
+}
+
+func t1() {
+	fmt.Println("a" < "b")
+	fmt.Println("2019-08-31" > "2019-08-31")
 }
 
 func test1() {

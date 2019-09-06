@@ -1,6 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/jinzhu/gorm"
+)
 
 // https://studygolang.com/articles/16667
 // 通过主表查关联表
@@ -10,6 +14,30 @@ import "fmt"
 
 func main() {
 	StartMysql()
+	GetAll()
+	// GetOne()
+}
+
+func GetAll() {
+	var messageUsers []MessageUser
+	var data []MessageUser
+	err := db.Where("wechat_id=?", "menglima").Find(&messageUsers).Error
+	if err != nil && err != gorm.ErrRecordNotFound {
+		fmt.Println(err)
+	}
+	for _, goodUser := range messageUsers {
+		err = db.Model(&goodUser).Association("Messages").Find(&goodUser.Messages).Error
+		if err != nil && err != gorm.ErrRecordNotFound {
+			fmt.Println(err)
+		}
+		fmt.Println("====message:", len(goodUser.Messages))
+		data = append(data, goodUser)
+	}
+	fmt.Println("=======data:", len(data[0].Messages))
+}
+
+// 查找某个主表及对应的从表
+func GetOne() {
 	var messageUser MessageUser
 	db.Where("wechat_id=?", "menglima").First(&messageUser)
 	fmt.Println("======:", messageUser)

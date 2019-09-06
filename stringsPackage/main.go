@@ -7,7 +7,15 @@ import (
 )
 
 func main() {
-	BasicUse()
+	// BasicUse()
+	Cotain()
+}
+
+func Cotain() {
+	i := strings.Index("hello world", "llo")
+	fmt.Println("======i", i)
+	i2 := strings.Index("hello world", "llod")
+	fmt.Println("======i", i2)
 }
 
 func BasicUse() {

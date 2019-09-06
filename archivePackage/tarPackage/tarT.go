@@ -33,7 +33,37 @@ func main() {
 	// 	decompress(*srcFile, *decompressDir)
 	// default:
 	// }
-	Compress("images", "images.tar")
+	// Compress("images", "images.tar")
+	// headerInfo()
+	Count()
+}
+
+func Count() {
+	f, _ := os.Open("20190323.tar")
+	defer f.Close()
+	tarRead := tar.NewReader(f)
+	count := 0
+	for _, err := tarRead.Next(); err != io.EOF; _, err = tarRead.Next() {
+		// fmt.Println(headInfo.Name)
+		count += 1
+	}
+	fmt.Println("count:", count)
+}
+
+func headerInfo() {
+	// tar -tzf 20190323.tar | wc -l
+	f, err := os.Stat("20190323.tar")
+	if err != nil {
+		fmt.Println(err)
+	}
+	h, err := tar.FileInfoHeader(f, "")
+	fmt.Println(h.Xattrs)
+	if err != nil {
+		fmt.Println(err)
+	}
+	info := h.FileInfo()
+
+	fmt.Println(info.Sys())
 }
 
 // 归档但不压缩
@@ -61,7 +91,7 @@ func Compress(src, desc string) {
 		if !info.IsDir() { // 文件夹没有 head 和 content
 			headerInfo, err := tar.FileInfoHeader(info, "")
 			checkErr(err)
-
+			fmt.Println("=====path:", path)
 			// 兼容 win 的 \
 			fpath, _ := filepath.Rel(src, path)
 			dir := filepath.Dir(fpath)

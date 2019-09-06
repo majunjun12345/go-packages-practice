@@ -39,31 +39,31 @@ func StartMysql() {
 			SenderId:   "11111111",
 			ReceiverId: "menglima",
 			Content:    "aaaaaaaa",
-			IsNew:      true,
+			IsNew:      1,
 		})
 		db.Create(&Message{
 			SenderId:   "11111111",
 			ReceiverId: "menglima",
 			Content:    "bbbbbbbb",
-			IsNew:      true,
+			IsNew:      1,
 		})
 		db.Create(&Message{
 			SenderId:   "11111111",
 			ReceiverId: "menglima",
 			Content:    "cccccccc",
-			IsNew:      true,
+			IsNew:      1,
 		})
 		db.Create(&Message{
 			SenderId:   "sssss",
 			ReceiverId: "sssss",
 			Content:    "sssss",
-			IsNew:      true,
+			IsNew:      1,
 		})
 		db.Create(&Message{
 			SenderId:   "rds",
 			ReceiverId: "87654",
 			Content:    "cccccccc",
-			IsNew:      true,
+			IsNew:      1,
 		})
 	}
 }
