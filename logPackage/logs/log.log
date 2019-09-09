@@ -1,0 +1,27 @@
+time="2019-08-31T09:28:54+08:00" level=info msg="A walrus appears" animal=walrus
+time="2019-08-31T09:28:54+08:00" level=warning msg="A walrus appears" animal=walrus
+time="2019-08-31T09:28:54+08:00" level=info msg=hahah common="this is a common field" other="this is other field"
+time="2019-08-31T10:41:22+08:00" level=info msg="A walrus appears" animal=walrus
+time="2019-08-31T10:41:22+08:00" level=warning msg="A walrus appears" animal=walrus
+time="2019-08-31T10:41:22+08:00" level=info msg=hahah common="this is a common field" other="this is other field"
+time="2019-08-31T10:41:24+08:00" level=info msg="A walrus appears" animal=walrus
+time="2019-08-31T10:41:24+08:00" level=warning msg="A walrus appears" animal=walrus
+time="2019-08-31T10:41:24+08:00" level=info msg=hahah common="this is a common field" other="this is other field"
+{"animal":"walrus","level":"info","msg":"A walrus appears","time":"2019-08-31T10:42:26+08:00"}
+{"animal":"walrus","level":"warning","msg":"A walrus appears","time":"2019-08-31T10:42:26+08:00"}
+{"common":"this is a common field","level":"info","msg":"hahah","other":"this is other field","time":"2019-08-31T10:42:26+08:00"}
+{"animal":"walrus","level":"info","msg":"A walrus appears","time":"2019-08-31 10:42:36"}
+{"animal":"walrus","level":"warning","msg":"A walrus appears","time":"2019-08-31 10:42:36"}
+{"common":"this is a common field","level":"info","msg":"hahah","other":"this is other field","time":"2019-08-31 10:42:36"}
+{"animal":"walrus","level":"info","msg":"A walrus appears","time":"2019-08-31 10:42:38"}
+{"animal":"walrus","level":"warning","msg":"A walrus appears","time":"2019-08-31 10:42:38"}
+{"common":"this is a common field","level":"info","msg":"hahah","other":"this is other field","time":"2019-08-31 10:42:38"}
+{"animal":"walrus","level":"info","msg":"A walrus appears","time":"2019-08-31 10:42:39"}
+{"animal":"walrus","level":"warning","msg":"A walrus appears","time":"2019-08-31 10:42:39"}
+{"common":"this is a common field","level":"info","msg":"hahah","other":"this is other field","time":"2019-08-31 10:42:39"}
+{"animal":"walrus","level":"info","msg":"A walrus appears","time":"2019-08-31 10:42:40"}
+{"animal":"walrus","level":"warning","msg":"A walrus appears","time":"2019-08-31 10:42:40"}
+{"common":"this is a common field","level":"info","msg":"hahah","other":"this is other field","time":"2019-08-31 10:42:40"}
+{"animal":"walrus","level":"info","msg":"A walrus appears","time":"2019-08-31 10:42:42"}
+{"animal":"walrus","level":"warning","msg":"A walrus appears","time":"2019-08-31 10:42:42"}
+{"common":"this is a common field","level":"info","msg":"hahah","other":"this is other field","time":"2019-08-31 10:42:42"}
