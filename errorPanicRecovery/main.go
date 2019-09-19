@@ -26,9 +26,11 @@ func (he *HttpError) Error() string {
 }
 
 func main() {
-	errTest()
+	// errTest()
 
 	// panicTest()
+
+	E()
 }
 
 // err
@@ -69,4 +71,14 @@ func panicTest() {
 	defer panic("a")
 	// defer panic("b")
 	fmt.Println("c")
+}
+
+// go1.13
+func E() {
+	err1 := errors.New("err one")
+	err2 := fmt.Errorf("err2:[%w]", err1)
+	err3 := fmt.Errorf("err3:[%w]", err2)
+	fmt.Println(err3)
+	fmt.Println(errors.Is(err3, err1))
+	fmt.Println(errors.Unwrap(err3))
 }
