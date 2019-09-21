@@ -16,6 +16,11 @@ func main() {
 	CheckErr(err)
 	defer db.Close()
 
+	err = db.Ping() // open 并不会建立一个连接,只有当你使用的时候才会建立连接,所以这里需要提前 ping 一下,确保连接正常
+	if err != nil {
+		panic(err.Error())
+	}
+
 	// singleQuery(db) // 22s
 	// bigQueryTest(db)// 264s
 

@@ -16,10 +16,14 @@ func init() {
 	db, err := sql.Open("mysql", "root:123456@tcp(127.0.0.1:3306)/goTest?charset=utf8&parseTime=true")
 	// defer db.Close()
 	CheckErr(err)
+	err = db.Ping() // open 并不会建立一个连接,只有当你使用的时候才会建立连接,所以这里需要提前 ping 一下,确保连接正常
+	if err != nil {
+		panic(err.Error())
+	}
 	DB = db
 	DB.SetConnMaxLifetime(100 * time.Second) //最大连接周期，超过时间的连接就close
-	DB.SetMaxOpenConns(100)                  //设置最大连接数
-	DB.SetMaxIdleConns(16)                   //设置闲置连接数
+	DB.SetMaxOpenConns(10)                   //设置最大连接数
+	DB.SetMaxIdleConns(10)                   //设置闲置连接数
 }
 
 func main() {
