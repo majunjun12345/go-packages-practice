@@ -91,7 +91,7 @@ func main() {
 // --------------------------insert exec 主要是执行插入和更新操作
 // 两种插入方式
 func insert() {
-	stmt, err := DB.Prepare("INSERT userinfo set username=?, created=?, married=?")
+	stmt, err := DB.Prepare("INSERT userinfo set username=?, created=?, married=?") // 最好先使用预处理
 	CheckErr(err)
 	_, err = stmt.Exec("memglima", GetTime(), false)
 	CheckErr(err)
