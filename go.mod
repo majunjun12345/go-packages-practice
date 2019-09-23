@@ -8,4 +8,5 @@ require (
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/jinzhu/gorm v1.9.10
+	github.com/mattn/go-sqlite3 v1.10.0
 )
