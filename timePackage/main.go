@@ -12,8 +12,9 @@ import (
 func main() {
 	// TimeFormat()
 
-	go removePreDirs()
-	time.Sleep(time.Second * 10)
+	// go removePreDirs()
+	// time.Sleep(time.Second * 10)
+	format()
 }
 
 /*
@@ -94,4 +95,16 @@ func removePreDirs() {
 		}
 		fmt.Println("tick")
 	}
+}
+
+func format() {
+	var timeLayoutStr = "2006-01-02"
+
+	st, _ := time.Parse(timeLayoutStr, "2019-08-31") //string转time
+	fmt.Println(st)
+	fmt.Println(st.Unix())
+	end := st.Add(time.Hour * 24) // 增加时间
+	fmt.Println(end.Unix())
+
+	fmt.Println(end.Format("2006-01-02"))
 }
