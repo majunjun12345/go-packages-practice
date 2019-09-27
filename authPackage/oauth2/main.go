@@ -20,22 +20,27 @@ import (
 		服务提供者(认证服务器): 用户通过其进行身份验证的外部应用程序 github
 
 	流程:
-		1. github 要求用户登录,用户选择使用 github 进行登录
-		2. gitlab 提供的 github 链接将会把用户带到 github 登录界面
+		1. gitlab 要求用户登录,用户选择使用 github 进行登录
+		2. 登录 github
+		   gitlab 提供的 github 链接将会把用户带到 github 登录界面
 		   应用index: http://localhost:8000/
 		   应用登录: http://localhost:8000/GithubLogin
 		   会获取到这个 url: https://github.com/login/oauth/authorize?client_id=6155ffa6f3921c4e67d5&redirect_uri=http%3A%2F%2Flocalhost%3A8000%2FGithubCallback&response_type=code&scope=user+repo&state=random
-		   重定向这个链接,会发出请求,定位到 github 的登录界面: https://github.com/login?client_id=6155ffa6f3921c4e67d5&return_to=%2Flogin%2Foauth%2Fauthorize%3Fclient_id%3D6155ffa6f3921c4e67d5%26redirect_uri%3Dhttp%253A%252F%252Flocalhost%253A8000%252FGithubCallback%26response_type%3Dcode%26scope%3Duser%2Brepo%26state%3Drandom
-		   点击登录后, 会请求这个 url: https://github.com/login/oauth/authorize?client_id=6155ffa6f3921c4e67d5&redirect_uri=http%3A%2F%2Flocalhost%3A8000%2FGithubCallback&response_type=code&scope=user+repo&state=random
-		   最后请求回调 url,利用 code 换 token: http://localhost:8000/GithubCallback?code=9c82da7fb8693660399e&state=random
-		3. 在 github 界面登录后,选择授权,也就是允许 gitlab 获取用户资料
-		4. 浏览器通过几次跳转后返回 gitlab,这时候我们已经完成了认证登录;
+		   里面的参数有：client_id、redirect_uri、response_type、scope、state
+		3. 登录 github 后会跳转到使用者设置的 redirect_uri
+		   http://localhost:8000/GithubCallback?code=9c82da7fb8693660399e&state=random
+		   并带上 code 和 state 参数
+		   在 redirect_uri 里面应实现用 code 换 token(post 方法)：
+			   https://github.com/login/oauth/access_token
+			   参数：map[code:[49850b3f29a4d625e567] grant_type:[authorization_code] redirect_uri:[http://localhost:8000/GithubCallback]]
+		   通过 token 在 github 获取用户信息
+				https://api.github.com/user?access_token=4cf54d32e3ea9cfbc93bb13d322f9ced9abc776f
 
 	跳转过程中 gitlab 与 github 的几次交互:
 		1. 选择授权的时候,github 服务器会根据 gitlab 转到 github 时候给出的重定向链接返回给 github 一个 code.
 		   这个 code 代表 github 的登录服务器认可 gitlab 这个应用服务器的这个请求是合法的并给予放行;
 		2. gitlab 这时候拿到 code 后再次向 github 登录服务器发起请求 token
-		3. gitlab 拿到 token 后, 向 github 服务提交的请求头带上该 token, token 验证通过就可以拿到用户信息;
+		3. gitlab 拿到 token 后, 向 github 服务提交的请求带上该 token, token 验证通过就可以拿到用户信息;
 */
 
 const htmlIndex = `<html><body>
