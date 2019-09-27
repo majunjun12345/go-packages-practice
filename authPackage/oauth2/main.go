@@ -36,6 +36,11 @@ import (
 		   通过 token 在 github 获取用户信息
 				https://api.github.com/user?access_token=4cf54d32e3ea9cfbc93bb13d322f9ced9abc776f
 
+	涉及到三个 github 的 url：
+		换 code：https://github.com/login/oauth/authorize
+		code 换 token：ttps://github.com/login/oauth/access_token
+		获取 user 信息：https://api.github.com/user
+
 	跳转过程中 gitlab 与 github 的几次交互:
 		1. 选择授权的时候,github 服务器会根据 gitlab 转到 github 时候给出的重定向链接返回给 github 一个 code.
 		   这个 code 代表 github 的登录服务器认可 gitlab 这个应用服务器的这个请求是合法的并给予放行;
