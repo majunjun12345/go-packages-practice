@@ -20,7 +20,7 @@ var conn *amqp.Connection
 // 通过 conn 得到，主要用于消息的发布和接收
 var Channel *amqp.Channel
 
-func main() {
+func main1() {
 	StartMQ()
 	Send()
 	Consume()
