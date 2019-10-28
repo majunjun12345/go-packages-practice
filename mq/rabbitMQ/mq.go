@@ -14,6 +14,7 @@ import (
 	- 持久性
 		消息的持久性(发送时)
 		队列的持久性
+		exchange 的持久化
 
 	- 断线重连
 		客户端需要负责断线重连的逻辑是很重要的，因为有可能客户端和HAProxy的连接是正常的，
@@ -61,6 +62,7 @@ func (r *RabbitMQ) Connect() {
 	r.Conn = conn
 
 	channel, err := conn.Channel()
+	// channel.Confirm(true)
 	if err != nil {
 		fmt.Println("create channel failed:", err)
 	}
@@ -172,7 +174,7 @@ func (r *RabbitMQ) Init(routingKey, exchangeName, exchangeType, queueName string
 		nil,
 	)
 	if err != nil {
-		fmt.Println("注册d队列失败:", err)
+		fmt.Println("注册队列失败:", err)
 		return err
 	}
 
@@ -230,7 +232,7 @@ func main() {
 	// 	Content: "mamengli3",
 	// }
 
-	// err = r.Produce(testPro)
+	err = r.Produce(testPro)
 	// err = r.Produce(testPro2)
 	// err = r.Produce(testPro3)
 	if err != nil {
