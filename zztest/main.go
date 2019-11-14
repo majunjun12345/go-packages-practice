@@ -7,10 +7,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"os"
+	"os/exec"
+	"path"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
+
+	"github.com/astaxie/beego"
 )
 
 func main() {
@@ -22,7 +28,10 @@ func main() {
 	// t1()
 	// ok := strings.HasSuffix("/Users/majun/sa6/test.tar", ".tar")
 	// fmt.Println(ok)
-	testTar("test.tar")
+	// testTar("test.tar")
+
+	p := getCurrentDirectory()
+	fmt.Println("path:", p)
 }
 
 func testTar(fpath string) {
@@ -117,4 +126,33 @@ func DefaultValueOfStruct() {
 func t() {
 	t := time.Time{}
 	fmt.Println(t.IsZero())
+}
+
+func RootPath() string {
+	s, err := exec.LookPath(os.Args[0])
+	if err != nil {
+		log.Panicln("发生错误", err.Error())
+	}
+	i := strings.LastIndex(s, "\\")
+	path := s[0 : i+1]
+	return path
+}
+
+func getCurrentPath() string {
+	_, filename, _, ok := runtime.Caller(1)
+	var cwdPath string
+	if ok {
+		cwdPath = path.Join(path.Dir(filename), "") // the the main function file directory
+	} else {
+		cwdPath = "./"
+	}
+	return cwdPath
+}
+
+func getCurrentDirectory() string {
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err != nil {
+		beego.Debug(err)
+	}
+	return strings.Replace(dir, "\\", "/", -1)
 }

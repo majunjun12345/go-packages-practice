@@ -9,10 +9,12 @@ import (
 )
 
 /*
+	bytes strings 是同类型的包
+
 	只要读出，就不能回头，string() bytes() 除外
 
-	bytes.Buffer 本身就是一个缓存（内存块），底层数据是 []byte，缓存的容量会根据需要
-	自动调整。大多数情况下，使用 new(Buffer) 就足以初始化一个 Buffer 了，具备读写功能；
+	bytes.Buffer 本身就是一个缓存（内存块或容器），底层数据是 []byte，缓存的容量会根据需要
+	自动调整。大多数情况下，使用 new(bytes.Buffer) 就可以初始化一个 Buffer 了，具备读写功能；
 
 	write 向尾部写
 	read 从游标头部读

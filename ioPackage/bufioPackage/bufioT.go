@@ -12,7 +12,7 @@ import (
 	https://blog.csdn.net/preyta/article/details/80655736
 
 	bufio 是缓冲区，达到条件后向底层数据读或写
-	bytes.buffer 只是存放数据的一个空间
+	bytes.buffer 只是存放数据的一个空间, 创建：buf := new(bytes.Buffer)
 
 	bufio.NewReaderSize 返回的 reader，可以 read readByte readBytes readLine readRune readString
 
