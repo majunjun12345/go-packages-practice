@@ -21,7 +21,9 @@ func main() {
 
 	// RWLock()
 
-	TestCond1()
+	// TestCond1()
+
+	TestOnce()
 
 }
 
@@ -122,4 +124,33 @@ func TestCond1() {
 	cond.Signal()    // 下发一个通知给已经获取锁的 goroutine
 	cond.Broadcast() // 下发通知给所有的 goroutine，排除 single 的 goroutine
 	time.Sleep(2 * time.Second)
+}
+
+// ------------------- once
+/*
+	type Once struct {
+		m    Mutex
+		done uint32
+	}
+	done 用来记录执行次数
+*/
+
+func TestOnce() {
+	wg := sync.WaitGroup{}
+	wg.Add(100)
+
+	once := sync.Once{}
+	onceFunc := func() {
+		fmt.Println("only once")
+	}
+
+	for i := 0; i < 100; i++ {
+		go func() {
+			once.Do(onceFunc)
+			wg.Done()
+		}()
+
+	}
+
+	wg.Done()
 }
