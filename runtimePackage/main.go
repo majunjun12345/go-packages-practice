@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"runtime"
+	"runtime/debug"
 )
 
 /*
@@ -11,12 +12,18 @@ import (
 */
 
 func main() {
+	// testSched()
+	testPrintStack()
+}
+
+func testSched() {
 	// 1 : 0 1 2 3 4 a 5 6 7 8 9，让出 cpu 时间片输出 a
 	// 2 随机，也有可能在输出 a 之前主进程就退出了，说明 主协程 和 go 携程 绑定了不同的 p
 	runtime.GOMAXPROCS(1)
 	exit := make(chan int)
 
 	go func() {
+		fmt.Println("b")
 		defer close(exit)
 		go func() {
 			fmt.Println("a")
@@ -30,4 +37,16 @@ func main() {
 		}
 	}
 	<-exit
+}
+
+// 打印堆栈信息
+func testPrintStack() {
+	defer func() {
+		if err := recover(); err != nil {
+			debug.PrintStack()
+		}
+	}()
+	a := 1
+	fmt.Println("haha", a)
+	panic("panic")
 }
