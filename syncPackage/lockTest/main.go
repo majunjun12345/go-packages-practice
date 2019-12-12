@@ -7,6 +7,21 @@ import (
 	"time"
 )
 
+/*
+	锁：
+	[谈谈 Golang 中的 Data Race](https://mp.weixin.qq.com/s/y8_TJYP2O2McrRXrMtd7TA)
+	一条简单的赋值语句并不是原子操作
+	例如，在 32 位机器上写 int64类型的变量是有中间状态的，它会被拆成两次写操作 MOV —— 写低 32 位和写高 32 位。
+
+	Mutex vs Atomic[无锁队列]：
+	mutex 由操作系统实现，而 atomic 包中的原子操作则由底层硬件直接提供支持；
+	在 CPU 实现的指令集里，有一些指令被封装进了 atomic 包，这些指令在执行的过程中是不允许中断（interrupt）的，
+	因此原子操作可以在 lock-free 的情况下保证并发安全，并且它的性能也能做到随 CPU 个数的增多而线性扩展。
+
+	若实现相同的功能，后者通常会更有效率，并且更能利用计算机多核的优势。
+	所以，以后当我们想并发安全的更新一些变量的时候，我们应该优先选择用 atomic 来实现。
+*/
+
 var unSafeInt int
 
 type SafeInt struct {
