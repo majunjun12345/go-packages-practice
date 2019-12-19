@@ -9,12 +9,18 @@ import (
 	"time"
 )
 
+// [你应该掌握的 Go 高级并发模式：计时器](https://mp.weixin.qq.com/s/Sk8SmDFdaOSxg_bQlQBHLg)
+
 func main() {
 	// TimeFormat()
 
 	// go removePreDirs()
 	// time.Sleep(time.Second * 10)
-	format()
+	// format()
+
+	// Timer()
+
+	t1()
 }
 
 /*
@@ -107,4 +113,28 @@ func format() {
 	fmt.Println(end.Unix())
 
 	fmt.Println(end.Format("2006-01-02"))
+}
+
+func Timer() {
+	fmt.Println(time.Now().UTC().Format("2006-01-02 15:04:05"))
+	timer := time.NewTimer(time.Second * 3)
+	timer.Reset(1)
+	fmt.Println(timer.Stop()) // 这里并没有关闭 timer.C 的 chanel，只是把 timer 从堆上删除了
+	fmt.Println(time.Now().UTC().Format("2006-01-02 15:04:05"))
+	select {
+	case <-timer.C:
+		fmt.Println(time.Now().UTC().Format("2006-01-02 15:04:05"))
+		fmt.Println("timer")
+	}
+}
+
+func t1() {
+	// 在协程里面执行函数
+	time.AfterFunc(5*time.Second, func() {
+		fmt.Println("hello world")
+	})
+	time.Sleep(6 * time.Second)
+
+	// 类似于 timer
+	time.After(3)
 }
