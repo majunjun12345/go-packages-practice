@@ -46,8 +46,10 @@ func main() {
 	// fmt.Println(t1())
 	// fmt.Println(t2())
 	// fmt.Println(t3())
-	fmt.Println(t4())
-	fmt.Println(t5())
+	// fmt.Println(t4())
+	// fmt.Println(t5())
+
+	t6()
 }
 
 func testOrderA() {
@@ -256,4 +258,21 @@ func t5() (n int) { // 5
 	}()
 	n++
 	return n
+}
+
+// ----------------------------------------------------------------
+//闭包，defer 能够在函数开始执行前 获取宿主函数的变量执行一些初始化函数
+func t6() {
+	a := "mamengli"
+	defer fmt.Println(hello(a)(" menglima"))
+}
+
+type fn func(string) string
+
+func hello(s string) fn {
+	fmt.Println(s)
+	return func(z string) string {
+		fmt.Println("end")
+		return s + z
+	}
 }
