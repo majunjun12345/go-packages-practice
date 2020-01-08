@@ -1,0 +1,20 @@
+{"level":"\u001b[34minfo\u001b[0m","time":"2020-01-08T10:27:58.754+0800","caller":"/Users/mj/go/src/go-package-study/src/testGoScripts/log-zap-package/main.go:65","msg":"初始化成功","serviceName":"spikeProxy"}
+{"level":"\u001b[34minfo\u001b[0m","time":"2020-01-08T10:27:58.754+0800","caller":"/Users/mj/go/src/go-package-study/src/testGoScripts/log-zap-package/main.go:67","msg":"无法获取网址","serviceName":"spikeProxy","url":"http://www.baidu.com","attempt":3,"backoff":1}
+{"level":"\u001b[34minfo\u001b[0m","time":"2020-01-08T11:18:55.359+0800","caller":"log-zap-package/main.go:65","msg":"初始化成功","serviceName":"spikeProxy"}
+{"level":"\u001b[34minfo\u001b[0m","time":"2020-01-08T11:18:55.360+0800","caller":"log-zap-package/main.go:67","msg":"无法获取网址","serviceName":"spikeProxy","url":"http://www.baidu.com","attempt":3,"backoff":1}
+{"level":"\u001b[34minfo\u001b[0m","time":"2020-01-08T11:27:34.732+0800","caller":"log-zap-package/main.go:65","msg":"初始化成功","serviceName":"spikeProxy"}
+{"level":"\u001b[34minfo\u001b[0m","time":"2020-01-08T11:27:34.733+0800","caller":"log-zap-package/main.go:67","msg":"无法获取网址","serviceName":"spikeProxy","url":"http://www.baidu.com","attempt":3,"backoff":"1s"}
+{"level":"\u001b[34minfo\u001b[0m","time":"2020-01-08T11:29:58.145+0800","caller":"log-zap-package/main.go:65","msg":"初始化成功","serviceName":"spikeProxy"}
+{"level":"\u001b[34minfo\u001b[0m","time":"2020-01-08T11:29:58.146+0800","caller":"log-zap-package/main.go:67","msg":"无法获取网址","serviceName":"spikeProxy","url":"http://www.baidu.com","attempt":3,"backoff":1000000000}
+{"level":"\u001b[34minfo\u001b[0m","time":"2020-01-08T11:40:01.116+0800","caller":"log-zap-package/main.go:66","msg":"初始化成功","serviceName":"spikeProxy"}
+{"level":"\u001b[34minfo\u001b[0m","time":"2020-01-08T11:40:01.116+0800","caller":"log-zap-package/main.go:68","msg":"无法获取网址","serviceName":"spikeProxy","url":"http://www.baidu.com","attempt":3,"backoff":1}
+{"level":"\u001b[33mwarn\u001b[0m","time":"2020-01-08T11:40:01.117+0800","caller":"log-zap-package/main.go:74","msg":"初始化失败","serviceName":"spikeProxy","stacktrace":"main.CustomLog\n\t/Users/mj/go/src/go-package-study/src/testGoScripts/log-zap-package/main.go:74\nmain.main\n\t/Users/mj/go/src/go-package-study/src/testGoScripts/log-zap-package/main.go:12\nruntime.main\n\t/usr/local/go/src/runtime/proc.go:203"}
+2020-01-08T14:17:10.879+0800	[34minfo[0m	log-zap-package/main.go:67	初始化成功	{"serviceName": "spikeProxy"}
+2020-01-08T14:17:10.879+0800	[34minfo[0m	log-zap-package/main.go:69	无法获取网址	{"serviceName": "spikeProxy", "url": "http://www.baidu.com", "attempt": 3, "backoff": 1}
+2020-01-08T14:17:10.880+0800	[33mwarn[0m	log-zap-package/main.go:75	初始化失败	{"serviceName": "spikeProxy"}
+main.CustomLog
+	/Users/mj/go/src/go-package-study/src/testGoScripts/log-zap-package/main.go:75
+main.main
+	/Users/mj/go/src/go-package-study/src/testGoScripts/log-zap-package/main.go:12
+runtime.main
+	/usr/local/go/src/runtime/proc.go:203
