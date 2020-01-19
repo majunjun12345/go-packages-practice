@@ -1,6 +1,11 @@
 package server
 
-import "log"
+import (
+	"fmt"
+	"log"
+
+	"github.com/spf13/viper"
+)
 
 var (
 	ServerPort  string
@@ -9,14 +14,19 @@ var (
 	CertKeyPath string
 )
 
-func Serve() (err error) {
+func Serve1() (err error) {
 	log.Println(ServerPort)
 
-	log.Println(CertName)
-
-	log.Println(CertPemPath)
-
-	log.Println(CertKeyPath)
+	// 貌似大小写不敏感
+	fmt.Println("path:", viper.Get("path"))
+	fmt.Println("NAME:", viper.Get("NAME"))
+	fmt.Println("LISTEN:", viper.Get("listen"))
+	// 嵌套
+	fmt.Println("db name:", viper.Get("db.name"))
 
 	return nil
+}
+
+func Serve2() {
+	fmt.Println("this is server2")
 }
