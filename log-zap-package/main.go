@@ -3,12 +3,17 @@ package main
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
+
+/*
+	分批次和异步写入：http://vearne.cc/archives/39275
+*/
 
 func main() {
 	// CustomLog()
@@ -86,8 +91,8 @@ func CustomLog() {
 // ----------------------------------------------------------------hook
 func conbineLumberjack() {
 	hook := lumberjack.Logger{
-		Filename:   "./logs/spikeProxy1.log",
-		MaxSize:    1,     // 每个日志文件的大小 M
+		Filename:   "./logs/spikeProxy.log",
+		MaxSize:    100,   // 每个日志文件的大小 M
 		MaxBackups: 3,     // 最大备份数
 		MaxAge:     1,     // 文件最多保存天数
 		Compress:   false, // 是否压缩
@@ -127,12 +132,8 @@ func conbineLumberjack() {
 	// 构造日志
 	logger := zap.New(core, caller, development, field)
 
-	for i := 0; i < 10000; i++ {
-		logger.Info("log 初始化成功")
-		logger.Info("无法获取网址",
-			zap.String("url", "http://www.baidu.com"),
-			zap.Int("attempt", 3),
-			zap.Duration("backoff", time.Second))
+	for i := 0; i < 1; i++ {
+		logger.Info("log success " + strconv.Itoa(i))
 	}
 
 	defer logger.Sync()

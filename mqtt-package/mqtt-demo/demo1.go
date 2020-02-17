@@ -46,7 +46,7 @@ var pushHandler MQTT.MessageHandler = func(client MQTT.Client, msg MQTT.Message)
 
 // sub handler
 var subscribeHandler = func(client MQTT.Client, message MQTT.Message) {
-	fmt.Printf("Received message on topic: %s\nMessage: %s\n", message.Topic(), message.Payload())
+	fmt.Printf("Received message on topic: %s\n\tMessage: %s\n", message.Topic(), message.Payload())
 }
 
 func main() {
@@ -55,7 +55,7 @@ func main() {
 	opts := MQTT.NewClientOptions().AddBroker("tcp://127.0.0.1:1883")
 	opts.SetClientID("go-simple")
 	// 设置连接超时
-	opts.SetConnectTimeout(60 * time.Second)
+	opts.SetConnectTimeout(5 * time.Second)
 	// 设置 handler
 	opts.SetDefaultPublishHandler(pushHandler)
 	// 心跳时间，单位秒
