@@ -22,7 +22,7 @@ import (
 		active：正常读写状态；
 		close：已关闭，不要认为关闭 channel 后，channel 的值是 nil；
 
-	读 关闭的 chan，读到的是对应类型的 零值；
+	读 关闭的 chan，如果里面有值，能读到正常的值，如果没有则，读到的是对应类型的 零值；
 	将 select 中的某个 chan 置 nil，会阻塞，但是不会死锁；
 */
 

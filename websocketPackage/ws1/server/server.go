@@ -109,7 +109,7 @@ func wsPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	uid, _ := uuid.NewV4()
+	uid := uuid.NewV4()
 
 	client := &Client{
 		id:     uid.String(),

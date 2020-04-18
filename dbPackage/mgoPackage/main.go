@@ -41,11 +41,11 @@ func init() {
 }
 
 func main() {
-	// mgoInsert()
+	mgoInsert()
 
 	// mgoSearch()
 
-	mgoPage()
+	// mgoPage()
 
 	// mgoUpdate()
 

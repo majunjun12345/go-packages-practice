@@ -10,6 +10,7 @@ import (
 
 // https://www.cnblogs.com/saryli/p/11654665.html
 // https://www.jianshu.com/p/05914c15b9a8
+// [几个MQTT的知识点](https://www.cnblogs.com/znlgis/p/4930990.html)
 
 /*
   须知：
@@ -36,6 +37,22 @@ import (
 		在建立连接的时候，我们可以传递一个 Keep Alive 参数，它的单位为秒，MQTT 协议中约定：在 1.5*Keep Alive 的时间间隔内，
 		如果 Broker 没有收到来自 Client 的任何数据包，那么 Broker 认为它和 Client 之间的连接已经断开；
 		同样地, 如果 Client 没有收到来自 Broker 的任何数据包，那么 Client 认为它和 Broker 之间的连接已经断开。
+
+	- qos
+		0: 最多一次
+		1: 最少一次
+		2: 只有一次
+
+		如果设置为 1 或 2时，需要设置cleansession=false，也就是每次登陆或重连，都使用的是一个 session，没有发送出的消息，
+		就保存在 session中，如果消息堆积严重，会导致内存崩溃。
+		如果要用到 session，就必须设置 clientid；
+
+		因此最好设置为 0，然后自己处理失败的逻辑
+
+	- token
+		token 用来指示操作是否完成
+		token.Wait()是个阻塞函数，只有在操作完成时才返回，确认收到 broker 的消息
+		token.WaitTimeout() 等待 broker 返回，如果在 t 之内就返回了， 为 true，否则为 false
 */
 
 // 创建全局mqtt publish消息处理 handler

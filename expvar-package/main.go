@@ -13,13 +13,18 @@ import (
 )
 
 /*
+
+metrics
+在学习go的metric的过程中，有些实现支持prometheus、expvar等，expvar是什么，竟然在sdk的库中？
+另外，发现jaeger(github.com/uber/jaeger-lib)也支持这种metric数据暴露方式。
+
 runtime 包拥有各种功能，包括goroutine数量，设置逻辑线程数量，当前go版本，当前系统类型等等；
 expvar 包可以监控服务运行各项指标和状态
 
 expvar包为监控变量提供了一个标准化的接口，它以 JSON 格式通过 /debug/vars 接口以 HTTP 的方式公开这些监控变量以及我自定义的变量。
 通过它，再加上metricBeat，ES和Kibana，可以很轻松的对服务进行监控。这里用 gin 把接口暴露出来，用别的web框架也都可以。
 
-expvar 返回给了我我之前自定义的数据，以及它本身要默认返回的数据，比如memstats：
+expvar 返回给了之前自定义的数据，以及它本身要默认返回的数据，比如memstats：
 1、Alloc uint64 //golang语言框架堆空间分配的字节数
 2、TotalAlloc uint64 //从服务开始运行至今分配器为分配的堆空间总 和，只有增加，释放的时候不减少
 3、Sys uint64 //服务现在系统使用的内存
@@ -52,6 +57,7 @@ expvar 返回给了我我之前自定义的数据，以及它本身要默认返�
 
 
 https://blog.csdn.net/jeffrey11223/article/details/78886923/
+https://studygolang.com/articles/12874
 
 expvar.Get("foo-prefix").String()    //获取到的值是`"foo"`   不是`foo`!!!
 最好还是使用expvar.NewXxx() 的原对象的Value()方式来取值就不会有问题了。
