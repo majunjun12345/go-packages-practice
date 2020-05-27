@@ -1,0 +1,1 @@
+{"level":"\u001b[34minfo\u001b[0m","time":"2020-04-04T21:36:38.625+0800","caller":"log-zap-package/main.go:136","msg":"log success 0","serviceName":"serviceName"}

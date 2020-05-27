@@ -53,6 +53,9 @@ import (
 		token 用来指示操作是否完成
 		token.Wait()是个阻塞函数，只有在操作完成时才返回，确认收到 broker 的消息
 		token.WaitTimeout() 等待 broker 返回，如果在 t 之内就返回了， 为 true，否则为 false
+
+	- SetCleanSession(true)
+		设置是否清空session,false表示服务器会保留客户端的连接记录，true表示每次连接到服务器都以新的身份连接
 */
 
 // 创建全局mqtt publish消息处理 handler

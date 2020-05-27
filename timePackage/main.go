@@ -12,7 +12,7 @@ import (
 // [你应该掌握的 Go 高级并发模式：计时器](https://mp.weixin.qq.com/s/Sk8SmDFdaOSxg_bQlQBHLg)
 
 func main() {
-	// TimeFormat()
+	TimeFormat()
 
 	// go removePreDirs()
 	// time.Sleep(time.Second * 10)
@@ -20,7 +20,8 @@ func main() {
 
 	// Timer()
 
-	t1()
+	// t1()
+	// fmt.Println(time.Now().Unix())
 }
 
 /*
@@ -65,29 +66,31 @@ func t() {
 }
 
 func TimeChan() {
-	timeOut := time.After(time.Second * 10)
+	// timeOut := time.After(time.Second * 10)
 	ticker := time.Tick(time.Second * 2)
 	// timer := time.NewTicker(time.Second * 10).C
 
-	s := make(chan int)
+	// s := make(chan int)
 
 	go func() {
 		for {
 			select {
-			case <-s:
-				fmt.Println("receive signal, stop!")
+			// case <-s:
+			// 	fmt.Println("receive signal, stop!")
 			case <-ticker:
 				fmt.Println("tick")
-			case <-timeOut:
-				fmt.Println("time out")
+				// case <-timeOut:
+				// 	fmt.Println("time out")
 			}
 		}
 	}()
 
-	time.Sleep(time.Second * 15)
-	s <- 3
-	time.Sleep(time.Second * 2)
-	fmt.Println("ending")
+	select {}
+
+	// time.Sleep(time.Second * 15)
+	// s <- 3
+	// time.Sleep(time.Second * 2)
+	// fmt.Println("ending")
 }
 
 func removePreDirs() {

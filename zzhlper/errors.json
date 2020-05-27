@@ -1,0 +1,8 @@
+{
+	"IoT.DataExport.InvalidAccessKeyIDToQingStor": "没有 qingStor 对象存储权限, 请确认已开通并有足够配额!",
+	"IoT.DataExport.RecordNotExisted": "数据导出记录不存在",
+	"IoT.DataExport.authNotExisted": "请授权qingStor对象存储授权",
+	"IoT.DataExport.autoExportInfoNotExisted": "数据导出(自动导出)信息不存在",
+	"IoT.DataExport.objectStorageConfConfExisted": "已授权qingStor对象存储",
+	"IoT.DataExport.objectStorageConfNotExisted": "请授权qingStor对象存储授权"
+}
