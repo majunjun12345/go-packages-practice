@@ -13,7 +13,8 @@ import (
 
 func main() {
 	// testSched()
-	testPrintStack()
+	// testPrintStack()z
+	// demo.demo2()
 }
 
 func testSched() {
