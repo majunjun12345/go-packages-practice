@@ -13,7 +13,7 @@ var cli *redis.Client
 func main() {
 	cli = redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
-		Password: "",
+		Password: "123456",
 		DB:       1,
 	})
 	defer cli.Close()
@@ -34,8 +34,70 @@ func main() {
 
 	// TransactionRedis()
 
-	PubSubRedis()
+	// PubSubRedis()
 
+	// Hset()
+
+	HashRedis()
+}
+
+func Hset() {
+	info := make(map[string]interface{})
+	info["status"] = "online"
+	// info["online_time"] = 1
+	info["update_time"] = time.Now().UnixNano() / 1e6
+	err := cli.HMSet("device_id", info).Err()
+	if err != nil {
+		panic(err)
+	}
+	time.Sleep(3 * time.Second)
+	err = cli.HIncrBy("device_id", "online_time", 5).Err()
+	if err != nil {
+		panic(err)
+	}
+
+	// err = cli.HSet("device_id", "online_time", 0).Err()
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	// info2 := make(map[string]interface{})
+	// info2["status"] = "offline"
+	// // info["online_time"] = 1
+	// info2["update_time"] = time.Now().UnixNano() / 1e6
+	// err = cli.HMSet("device_id", info2).Err()
+	// if err != nil {
+	// 	panic(err)
+	// }
+}
+
+// hash
+func HashRedis() {
+	cli.HSet("myinfo", "name", "menglima").Result()
+	info := make(map[string]interface{})
+	info["age"] = 19
+	info["home"] = "xiantao"
+	cli.HMSet("myinfo", info)
+	// fmt.Println(cli.HExists("myinfo", "name").Result())
+	// fmt.Println(cli.HDel("myinfo", "name").Result())
+	// fmt.Println(cli.HExists("myinfo", "name").Result())
+	fmt.Println(cli.HGetAll("myinfo").Result())
+	fmt.Println(cli.HIncrBy("myinfo", "age", 1).Result())
+	fmt.Println(cli.HKeys("myinfo").Result()) // keys 列表
+	fmt.Println(cli.HVals("myinfo").Result()) // values 列表
+	fmt.Println(cli.HLen("myinfo").Result())
+	fmt.Println(cli.HSetNX("myinfo", "phone", "189").Result())
+
+	// iter := cli.HScan("myinfo", 0, "", 1).Iterator() // 参数:redis的键,从哪里开始迭代, 匹配的value, 每次获取 value的个数 (hash 的 key value 是分开的)
+	// for iter.Next() {
+	// 	fmt.Println("1111")
+	// 	iter.Next() // 这样可以忽略 hash 的 key
+	// 	fmt.Println("iter value:", iter.Val())
+	// }
+
+	// results, _ := cli.Scan(0, "device_", 100).Val()
+	n, _ := cli.HIncrBy("device_id_01", "1", 5).Result()
+	fmt.Println("======", n)
 }
 
 // string
@@ -79,31 +141,6 @@ func StringRedis() {
 	cli.Incr("key1").Result()                         // 自增 1  数值才有效
 	cli.DecrBy("key1", 4).Result()                    // 自减 n
 	cli.Append("key1", "sanqi").Result()              //  相当于字符串的 +
-}
-
-// hash
-func HashRedis() {
-	cli.HSet("myinfo", "name", "menglima").Result()
-	info := make(map[string]interface{})
-	info["age"] = 19
-	info["home"] = "xiantao"
-	cli.HMSet("myinfo", info)
-	// fmt.Println(cli.HExists("myinfo", "name").Result())
-	// fmt.Println(cli.HDel("myinfo", "name").Result())
-	// fmt.Println(cli.HExists("myinfo", "name").Result())
-	fmt.Println(cli.HGetAll("myinfo").Result())
-	fmt.Println(cli.HIncrBy("myinfo", "age", 1).Result())
-	fmt.Println(cli.HKeys("myinfo").Result()) // keys 列表
-	fmt.Println(cli.HVals("myinfo").Result()) // values 列表
-	fmt.Println(cli.HLen("myinfo").Result())
-	fmt.Println(cli.HSetNX("myinfo", "phone", "189").Result())
-
-	iter := cli.HScan("myinfo", 0, "", 1).Iterator() // 参数:redis的键,从哪里开始迭代, 匹配的value, 每次获取 value的个数 (hash 的 key value 是分开的)
-	for iter.Next() {
-		fmt.Println("1111")
-		iter.Next() // 这样可以忽略 hash 的 key
-		fmt.Println("iter value:", iter.Val())
-	}
 }
 
 // list

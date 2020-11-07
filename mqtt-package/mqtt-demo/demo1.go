@@ -56,6 +56,10 @@ import (
 
 	- SetCleanSession(true)
 		设置是否清空session,false表示服务器会保留客户端的连接记录，true表示每次连接到服务器都以新的身份连接
+
+	- setWill
+		如果项目中需要知道客户端是否掉线可以调用该方法。设置最终端口的通知消息 
+		option.setWill(topic, "close".getBytes(), 2, true);
 */
 
 // 创建全局mqtt publish消息处理 handler

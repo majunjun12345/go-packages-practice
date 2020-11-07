@@ -6,8 +6,10 @@ require (
 	git.internal.yunify.com/majun/pipe2ignite v0.0.0-20191212091909-f23661d9be46
 	github.com/Shopify/sarama v1.19.0
 	github.com/Workiva/go-datastructures v1.0.50
+	github.com/alexedwards/scs/v2 v2.4.0 // indirect
 	github.com/astaxie/beego v1.12.0
 	github.com/aws/aws-sdk-go v1.23.0
+	github.com/casbin/casbin v1.9.1 // indirect
 	github.com/dgraph-io/badger v1.6.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/eclipse/paho.mqtt.golang v1.2.0
@@ -15,7 +17,11 @@ require (
 	github.com/garyburd/redigo v1.6.0
 	github.com/gin-contrib/sse v0.0.0-20190301062529-5545eab6dad3 // indirect
 	github.com/gin-gonic/gin v1.3.0
+	github.com/go-redis/redis v6.14.2+incompatible
 	github.com/go-sql-driver/mysql v1.4.1
+	github.com/gobwas/httphead v0.0.0-20180130184737-2c6c146eadee // indirect
+	github.com/gobwas/pool v0.2.1 // indirect
+	github.com/gobwas/ws v1.0.3
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/protobuf v1.3.2
 	github.com/gomodule/redigo v2.0.0+incompatible
@@ -37,6 +43,7 @@ require (
 	github.com/paulbellamy/ratecounter v0.2.0
 	github.com/pkg/errors v0.8.1
 	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0
+	github.com/robfig/cron v1.2.0
 	github.com/satori/go.uuid v1.2.0
 	github.com/shiena/ansicolor v0.0.0-20151119151921-a422bbe96644 // indirect
 	github.com/sirupsen/logrus v1.4.2
@@ -45,11 +52,17 @@ require (
 	github.com/spf13/pflag v1.0.3
 	github.com/spf13/viper v1.3.2
 	github.com/streadway/amqp v0.0.0-20190827072141-edfb9018d271
+	github.com/stretchr/testify v1.4.0
 	github.com/ugorji/go v1.1.2 // indirect
 	github.com/urfave/negroni v1.0.0
+	github.com/vmihailenco/msgpack v4.0.4+incompatible
 	github.com/yunify/qingcloud-sdk-go v2.0.0-alpha.35+incompatible
+	go.etcd.io/etcd v3.3.22+incompatible
 	go.uber.org/zap v1.12.0
+	golang.org/x/net v0.0.0-20191109021931-daa7c04131f5
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
+	golang.org/x/text v0.3.2
+	google.golang.org/grpc v1.25.1
 	gopkg.in/fsnotify.v1 v1.4.7
 	gopkg.in/gcfg.v1 v1.2.3
 	gopkg.in/go-playground/validator.v8 v8.18.2 // indirect

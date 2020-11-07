@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	_ "net/http/pprof"
 )
 
 func main() {
@@ -10,6 +11,9 @@ func main() {
 	http.HandleFunc("/post/1", p1)
 	http.HandleFunc("/post/2", p3)
 
+	go func() {
+		fmt.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
 	http.ListenAndServe(":1234", nil)
 }
 

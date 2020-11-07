@@ -24,9 +24,9 @@ type ClientManager struct {
 }
 
 type Message struct {
-	Sender    string `json:"sender, omitempty"` // 为空则不输出
-	Recipient string `json:"recipient, omitempty"`
-	Content   string `json:"content, omitempty"`
+	Sender    string `json:"sender,omitempty"` // 为空则不输出
+	Recipient string `json:"recipient,omitempty"`
+	Content   string `json:"content,omitempty"`
 }
 
 var manager = ClientManager{

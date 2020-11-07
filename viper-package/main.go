@@ -33,9 +33,9 @@ Viper读取配置顺序
 	默认值
 */
 
-func main1() {
-	ReadFromEnv()
-	// ReadConfigOnUpdata()
+func main() {
+	// ReadFromEnv()
+	ReadConfigOnUpdata()
 }
 
 // 环境变量中读取配置文件：
@@ -51,7 +51,7 @@ func ReadConfigOnUpdata() {
 	// 全局的
 	viper.SetConfigName("config")
 	// viper.AddConfigPath(".")
-	viper.SetConfigFile("./config.yaml")
+	viper.SetConfigFile("./conf/config.yaml")
 	err := viper.ReadInConfig()
 	if err != nil {
 		panic(fmt.Errorf("Fatal error config file: %s n", err))
@@ -59,7 +59,7 @@ func ReadConfigOnUpdata() {
 
 	// 实时重新读取配置文件
 	viper.WatchConfig()
-	// 如果文件配置文件发生改变就会触发
+	// 如果配置文件发生改变就会触发
 	viper.OnConfigChange(func(e fsnotify.Event) {
 		fmt.Println("Config file changed:", e.Name)
 		fmt.Println(viper.Get("denyu"))
@@ -76,7 +76,7 @@ var (
 	cfg = pflag.StringP("config", "c", "conf/config.yaml", "config file")
 )
 
-func main() {
+func main1() {
 	pflag.Parse()
 
 	// init flag
