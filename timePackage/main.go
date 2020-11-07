@@ -12,7 +12,8 @@ import (
 // [你应该掌握的 Go 高级并发模式：计时器](https://mp.weixin.qq.com/s/Sk8SmDFdaOSxg_bQlQBHLg)
 
 func main() {
-	TimeFormat()
+	fmt.Println(time.Now().Local().Format("2006-01-02:15"))
+	// TimeFormat()
 
 	// go removePreDirs()
 	// time.Sleep(time.Second * 10)
@@ -22,6 +23,38 @@ func main() {
 
 	// t1()
 	// fmt.Println(time.Now().Unix())
+
+	// tf := "2020-08-11T22:35:00Z"
+	// stamp, _ := time.ParseInLocation("2006-01-02T15:04:05Z", tf, time.Local)
+	// fmt.Println("======", stamp.UnixNano()/1e6)
+	// fmt.Println("2020-05-18-16:17:45"[0:10])
+
+	// var (
+	// 	wg sync.WaitGroup
+
+	// 	filenames []string
+	// 	filename  string
+	// )
+
+	// filenameChan := make(chan string, 5)
+
+	// for i := 0; i < 5; i++ {
+	// 	wg.Add(1)
+	// 	go func(ii int) {
+	// 		defer wg.Done()
+	// 		filename = fmt.Sprintf("%d.txt", ii)
+
+	// 		filenameChan <- filename
+	// 	}(i)
+	// }
+	// wg.Wait()
+	// close(filenameChan)
+
+	// for f := range filenameChan {
+	// 	filenames = append(filenames, f)
+	// }
+
+	// fmt.Println(filenames)
 }
 
 /*
@@ -109,7 +142,7 @@ func removePreDirs() {
 func format() {
 	var timeLayoutStr = "2006-01-02"
 
-	st, _ := time.Parse(timeLayoutStr, "2019-08-31") //string转time
+	st, _ := time.ParseInLocation(timeLayoutStr, "2020-06-23", time.Local) //string转time
 	fmt.Println(st)
 	fmt.Println(st.Unix())
 	end := st.Add(time.Hour * 24) // 增加时间
