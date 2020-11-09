@@ -11,6 +11,10 @@ import (
 
 // [你应该掌握的 Go 高级并发模式：计时器](https://mp.weixin.qq.com/s/Sk8SmDFdaOSxg_bQlQBHLg)
 
+var (
+	cst *time.Location
+)
+
 func main() {
 	fmt.Println(time.Now().Local().Format("2006-01-02:15"))
 	// TimeFormat()
@@ -55,6 +59,14 @@ func main() {
 	// }
 
 	// fmt.Println(filenames)
+}
+
+func init() {
+	var err error
+	if cst, err = time.LoadLocation("Asia/Shanghai"); err != nil {
+		panic(err)
+	}
+	fmt.Println("======", time.Now().In(cst).Format("2006-01-02 15:04:05.000"))
 }
 
 /*
