@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"net"
 
+	"testGoScripts/grpc-server-register-find/pprof"
 	"testGoScripts/grpc-server-register-find/proto"
 	"testGoScripts/grpc-server-register-find/register"
 
+	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 )
 
@@ -53,6 +55,12 @@ func main() {
 	if listen, err = net.Listen("tcp", address); err != nil {
 		panic(err)
 	}
+
+	// http://localhost:8080/debug/
+	// http://localhost:8080/debug/statsviz/
+	r := gin.New()
+	pprof.Router(r)
+	r.Run(":8080")
 
 	s.Serve(listen)
 }
