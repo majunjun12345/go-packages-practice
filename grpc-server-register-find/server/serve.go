@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"github.com/go-echarts/statsview"
 	"net"
 
 	"testGoScripts/grpc-server-register-find/pprof"
@@ -58,9 +59,18 @@ func main() {
 
 	// http://localhost:8080/debug/
 	// http://localhost:8080/debug/statsviz/
-	r := gin.New()
-	pprof.Router(r)
-	r.Run(":8080")
+	go func() {
+		r := gin.New()
+		pprof.Router(r)
+		r.Run(":8080")
+	}()
+
+	// http://localhost:18066/debug/statsview
+	// http://localhost:18066/debug/pprof/
+	go func() {
+		mgr := statsview.New()
+		mgr.Start()
+	}()
 
 	s.Serve(listen)
 }
