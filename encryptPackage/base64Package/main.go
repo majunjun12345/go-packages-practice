@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"fmt"
+	"net/url"
 )
 
 /*
@@ -18,7 +19,8 @@ func main() {
 	encodeStd := "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
 	s64 := base64.NewEncoding(encodeStd).EncodeToString([]byte(s))
 	fmt.Println(s64)
-
+	urlSafe := url.QueryEscape(s64) // 将空格编码为加号,并对URL查询组件中无效的其他字符使用百分比编码
+	fmt.Println(urlSafe)
 	// 标准的
 	enc_std := base64.StdEncoding.EncodeToString([]byte(s))
 	fmt.Println(enc_std)
