@@ -7,10 +7,25 @@ import (
 	"github.com/Shopify/sarama"
 )
 
-var wg sync.WaitGroup
+var (
+	topic     = "test"
+	partition = 0 // 消费的时候需要指定 partition
+	addrs     = []string{"192.168.0.103:9092"}
+
+	wg sync.WaitGroup
+)
 
 func main() {
-	consumer, err := sarama.NewConsumer(addrs, nil)
+
+}
+
+func singleConsumer() {
+	config := sarama.NewConfig()
+	config.Consumer.Return.Errors = true
+	config.Version = sarama.V2_0_0_0
+	config.Consumer.Offsets.Initial = sarama.OffsetOldest
+
+	consumer, err := sarama.NewConsumer(addrs, config)
 	if err != nil {
 		fmt.Printf("Failed to create sarama consumer: %v", err)
 		panic(err)
@@ -27,10 +42,10 @@ func main() {
 	for _, partition := range partitionList {
 		fmt.Printf("partition: %v\n", partition)
 
-		// ConsumePartition 方法根据主题，分区和给定的偏移量创建创建了相应的分区消费者
+		// ConsumePartition 方法根据 topic，分区和给定的偏移量创建创建了相应的分区消费者
 		// 如果该分区消费者已经消费了该信息将会返回error
 		// sarama.OffsetNewest:表明了为最新消息，-1
-		partitionConsumer, err := consumer.ConsumePartition(topic, partition, sarama.OffsetNewest)
+		partitionConsumer, err := consumer.ConsumePartition(topic, partition, sarama.OffsetOldest)
 		if err != nil {
 			fmt.Printf("Failed to consume partition: %v", err)
 			panic(err)

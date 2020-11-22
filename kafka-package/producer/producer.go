@@ -8,14 +8,21 @@ import (
 	"github.com/golang/glog"
 )
 
+var (
+	topic     = "test"
+	partition = 0 // 消费的时候需要指定 partition
+	addrs     = []string{"192.168.0.103:9092"}
+
+	saslEnable = false
+	tlsEnable  = false
+	clientcert = ""
+	clientkey  = ""
+	cacert     = ""
+)
+
 func main() {
-	// syncProducer()
-	// consumer()
-	metadata()
-}
-
-func init() {
-
+	syncProducer()
+	// asyncProducer()
 }
 
 // 消息量大必须用异步生产
@@ -45,6 +52,8 @@ func asyncProducer() {
 				if err != nil {
 					glog.Errorln(err)
 				}
+			// 如果打开了Return.Successes配置，而又没有p.Successes()提取，那么Successes()这个chan消息会被写满。
+			// config.Producer.Return.Successes = true和操作<-producer.Successes()必须配套使用
 			case suc := <-p.Successes():
 				fmt.Printf("producer success: %v\n", suc.Offset)
 			}
@@ -56,6 +65,7 @@ func asyncProducer() {
 		//Key:   sarama.StringEncoder("go_test"),
 		Value: sarama.ByteEncoder("this is message"),
 	}
+	// 异步发送消息的方式
 	producer.Input() <- msg
 	select {}
 }
@@ -77,84 +87,13 @@ func syncProducer() {
 		msg := &sarama.ProducerMessage{}
 		msg.Topic = topic
 		msg.Value = sarama.StringEncoder("this is a good test,hello kai")
-		//发送消息
-		pid, offset, err := syncProducer.SendMessage(msg)
+		// 同步发送消息的方式
+		partition, offset, err := syncProducer.SendMessage(msg)
 		if err != nil {
 			fmt.Println("send message failed,", err)
 			return
 		}
-		fmt.Printf("pid:%v offset:%v\n", pid, offset)
+		fmt.Printf("partition:%v offset:%v\n", partition, offset)
 		time.Sleep(time.Second)
-	}
-}
-
-func consumer() {
-	config := sarama.NewConfig()
-	config.Consumer.Return.Errors = true
-	config.Version = sarama.V2_0_0_0
-
-	// consumer
-	consumer, err := sarama.NewConsumer(addrs, config)
-	if err != nil {
-		fmt.Printf("consumer_test create consumer error %s\n", err.Error())
-		return
-	}
-	defer consumer.Close()
-
-	partitions, err := consumer.Partitions(topic)
-	if err != nil {
-		fmt.Printf("consumer get partitions error %s\n", err)
-	}
-
-	for _, partition := range partitions {
-		partitionConsumer, err := consumer.ConsumePartition(topic, partition, sarama.OffsetOldest)
-		if err != nil {
-			fmt.Printf("try create partition_consumer error %s\n", err.Error())
-			continue
-		}
-
-		for {
-			select {
-			case msg := <-partitionConsumer.Messages():
-				fmt.Printf("msg offset: %d, partition: %d, timestamp: %s, value: %s\n",
-					msg.Offset, msg.Partition, msg.Timestamp.String(), string(msg.Value))
-			case err := <-partitionConsumer.Errors():
-				fmt.Printf("err :%s\n", err.Error())
-			}
-		}
-	}
-}
-
-// 元数据
-func metadata() {
-	config := sarama.NewConfig()
-	config.Version = sarama.V0_11_0_2
-
-	client, err := sarama.NewClient(addrs, config)
-	if err != nil {
-		fmt.Printf("metadata_test try create client err :%s\n", err.Error())
-		return
-	}
-
-	defer client.Close()
-
-	// get topic set
-	topics, err := client.Topics()
-	if err != nil {
-		fmt.Printf("try get topics err %s\n", err.Error())
-		return
-	}
-
-	fmt.Printf("topics(%d):\n", len(topics))
-
-	for _, topic := range topics {
-		fmt.Println(topic)
-	}
-
-	// get broker set
-	brokers := client.Brokers()
-	fmt.Printf("broker set(%d):\n", len(brokers))
-	for _, broker := range brokers {
-		fmt.Printf("%s\n", broker.Addr())
 	}
 }

@@ -34,7 +34,7 @@ import (
 var (
 	topic     = "test"
 	partition = 0 // 消费的时候需要指定 partition
-	addrs     = []string{"192.168.51.163:9092"}
+	addrs     = []string{"192.168.0.103:9092"}
 
 	saslEnable = false
 	tlsEnable  = false
@@ -47,7 +47,8 @@ var (
 )
 
 func main() {
-	kafka()
+	// kafka()
+	metadata()
 }
 
 // 通过 client 创建 consumer 或 producer
@@ -66,6 +67,7 @@ func kafka() {
 		conf.Net.SASL.User = "username"
 		conf.Net.SASL.Password = "password"
 	}
+
 	// https
 	if tlsEnable {
 		//sarama.Logger = log.New(os.Stdout, "[sarama] ", log.LstdFlags)
@@ -90,8 +92,9 @@ func kafka() {
 			log.Fatal(err)
 		}
 		defer producer.Close()
-		loopProducer(producer, topic, partition)
-	} else {
+		loopProducer(producer, topic)
+	}
+	if command == "consumer" {
 		consumer, err := sarama.NewConsumerFromClient(client)
 		if err != nil {
 			log.Fatal(err)
@@ -133,7 +136,6 @@ func loopConsumer(consumer sarama.Consumer, topic string, partition int) {
 	}
 	defer partitionConsumer.Close()
 
-	// 这里用 for 不知道为什么只消费了一个
 	for {
 		select {
 		case msg := <-partitionConsumer.Messages():
@@ -145,30 +147,72 @@ func loopConsumer(consumer sarama.Consumer, topic string, partition int) {
 	}
 }
 
-func loopProducer(producer sarama.AsyncProducer, topic string, partition int) {
+func loopProducer(producer sarama.AsyncProducer, topic string) {
 	scanner := bufio.NewScanner(os.Stdin)
 	fmt.Print("> ")
 	for scanner.Scan() {
 		text := scanner.Text()
 		if text == "" {
-		} else if text == "exit" || text == "quit" {
-			break
-		} else {
-			producer.Input() <- &sarama.ProducerMessage{
-				Topic: topic,
-				Key:   nil,
-				Value: sarama.StringEncoder(text),
-			}
-			log.Printf("Produced message: [%s]\n", text)
+			continue
+		}
 
-			// 判断消息是否生产成功
-			select {
-			case suc := <-producer.Successes():
-				fmt.Printf("offset: %d,  timestamp: %s\n", suc.Offset, suc.Timestamp.Unix())
-			case fail := <-producer.Errors():
-				fmt.Printf("err: %s\n", fail.Err.Error())
-			}
+		if text == "exit" || text == "quit" {
+			break
+		}
+
+		producer.Input() <- &sarama.ProducerMessage{
+			Topic: topic,
+			Key:   nil,
+			Value: sarama.StringEncoder(text),
+		}
+		log.Printf("Produced message: [%s]\n", text)
+
+		// 判断消息是否生产成功
+		select {
+		case suc := <-producer.Successes():
+			fmt.Printf("offset: %d,  timestamp: %d\n", suc.Offset, suc.Timestamp.Unix())
+		case fail := <-producer.Errors():
+			fmt.Printf("err: %s\n", fail.Err.Error())
 		}
 		fmt.Print("> ")
 	}
+}
+
+// metadata 元数据
+func metadata() {
+	var (
+		config  = sarama.NewConfig()
+		client  sarama.Client
+		topics  []string
+		brokers []*sarama.Broker
+		err     error
+	)
+
+	if client, err = sarama.NewClient(addrs, config); err != nil {
+		fmt.Printf("metadata try create client err :%s\n", err.Error())
+		return
+	}
+	defer client.Close()
+
+	// get topic set
+	if topics, err = client.Topics(); err != nil {
+		fmt.Printf("try get topics err %s\n", err.Error())
+		return
+	}
+	fmt.Printf("topics(%d):\n", len(topics))
+	for _, topic := range topics {
+		fmt.Println(topic)
+	}
+
+	brokers = client.Brokers()
+	fmt.Printf("broker set(%d):\n", len(brokers))
+	for _, broker := range brokers {
+		fmt.Printf("%s\n", broker.Addr())
+	}
+
+	partion, err := client.Partitions(topic)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("partion:", partion)
 }
