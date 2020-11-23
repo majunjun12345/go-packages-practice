@@ -1,10 +1,12 @@
+[Gnet 导视](https://gnet.host/blog/presenting-gnet-cn/)
+
 ##### 目前支持以下六个事件
 
 // PreWrite  预先写数据方法，在 server 端写数据回 client 端之前调用
 func (s *echoServer) PreWrite() {
 }
 
-// Tick 服务器启动的时候会调用一次，之后就以给定的时间间隔定时调用一次，是一个定时器方法
+// Tick 服务器启动的时候会调用一次，之后就以给定的时间间隔定时调用一次，是一个定时器方法，设定返回的 delay 即可
 func (s *echoServer) Tick() (delay time.Duration, action gnet.Action) {
 	return
 }

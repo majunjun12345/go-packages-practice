@@ -26,6 +26,21 @@ func (cs *codecServer) OnInitComplete(srv gnet.Server) (action gnet.Action) {
 	return
 }
 
+func (cs *codecServer) OnShutdown(svr gnet.Server) {
+	fmt.Println(svr.Addr)
+}
+
+func (cs *codecServer) OnOpened(c gnet.Conn) (out []byte, action gnet.Action) {
+	fmt.Println("======", c.RemoteAddr())
+	return
+}
+
+func (cs *codecServer) Tick() (delay time.Duration, action gnet.Action) {
+	fmt.Println("====tick====")
+	delay = time.Second * 5
+	return
+}
+
 func (cs *codecServer) React(frame []byte, c gnet.Conn) (out []byte, action gnet.Action) {
 	if cs.async {
 		data := append([]byte{}, frame...)
@@ -57,7 +72,7 @@ func testCodecServe(addr string, multicore, async bool, codec gnet.ICodec) {
 		codec = gnet.NewLengthFieldBasedFrameCodec(encoderConfig, decoderConfig)
 	}
 	cs := &codecServer{addr: addr, multicore: multicore, async: async, codec: codec, workerPool: goroutine.Default()}
-	err = gnet.Serve(cs, addr, gnet.WithMulticore(multicore), gnet.WithTCPKeepAlive(time.Minute*5), gnet.WithCodec(codec))
+	err = gnet.Serve(cs, addr, gnet.WithMulticore(multicore), gnet.WithTCPKeepAlive(time.Minute*5), gnet.WithCodec(codec), gnet.WithTicker(true))
 	if err != nil {
 		panic(err)
 	}
