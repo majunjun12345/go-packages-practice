@@ -36,7 +36,7 @@ func main() {
 		resp *pb.HelloReply
 	)
 
-	if resp, err = GetServerIns().SayHello(context.Background(), &pb.HelloRequest{Name: "grpc"}); err != nil {
+	if resp, err = GetServerIns().SayHello(context.Background(), &pb.HelloRequest{Name: "mamengli"}); err != nil {
 		fmt.Println(err)
 	}
 	fmt.Println(resp.Message)

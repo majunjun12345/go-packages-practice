@@ -4,8 +4,9 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/go-echarts/statsview"
 	"net"
+
+	"github.com/go-echarts/statsview"
 
 	"testGoScripts/grpc-server-register-find/pprof"
 	"testGoScripts/grpc-server-register-find/proto"
@@ -13,6 +14,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 var (
@@ -52,6 +54,7 @@ func main() {
 
 	// 注册helloServer为客户端提供服务
 	proto.RegisterHelloServer(s, &helloService{})
+	reflection.Register(s)
 
 	if listen, err = net.Listen("tcp", address); err != nil {
 		panic(err)
