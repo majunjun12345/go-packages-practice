@@ -8,5 +8,10 @@
     [通过这个 Runtime 统计信息可视化库学到了什么？](https://mp.weixin.qq.com/s/sRxKJa-zKo-Lb7KRKLhthA)
 * 使用 grpcui 进行 grpc 调用
 * 整合 trace jeager: http://127.0.0.1:16686
+  // JAEGER_AGENT_HOST=127.0.0.1
+  // JAEGER_AGENT_PORT=6831
+  // JAEGER_REPORTER_LOG_SPANS=1
+  // JAEGER_SAMPLER_TYPE=const
+  // JAEGER_SAMPLER_PARAM=1
   http-gateway(start trace: root span) => grpc client(span) => grpc server(span)
   在 gin => grpc client 时特别要注意 ctx 的传递, timeout 是在 r.Use(Tracer()) 传递进去的
