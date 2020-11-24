@@ -3,18 +3,25 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"net"
 
 	"github.com/go-echarts/statsview"
+	"github.com/opentracing/opentracing-go"
 
 	"testGoScripts/grpc-server-register-find/pprof"
 	"testGoScripts/grpc-server-register-find/proto"
 	"testGoScripts/grpc-server-register-find/register"
+	"testGoScripts/grpc-server-register-find/tool"
+	"testGoScripts/grpc-server-register-find/tool/tracer"
+	"testGoScripts/zaplog"
 
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+)
+
+const (
+	SERVER_NAME = "hello"
 )
 
 var (
@@ -31,26 +38,25 @@ type helloService struct {
 }
 
 func (h helloService) SayHello(ctx context.Context, req *proto.HelloRequest) (*proto.HelloReply, error) {
-	resp := &proto.HelloReply{} // resp := new(pb.HelloReply)
-	resp.Message = "hello " + req.Name + "."
-	fmt.Println("handler request", address, node)
-	return resp, nil
+	return &proto.HelloReply{Message: "hello " + req.Name + "."}, nil
 }
 
 func main() {
 	flag.Parse()
+	tool.InitLog()
+
+	tracer.InitGlobal(SERVER_NAME, zaplog.GetLogger())
 
 	var (
 		listen net.Listener
 		err    error
 	)
-	fmt.Println(address)
-	if err := register.InitServiceReg("hello", node, address, []string{"http://127.0.0.1:2379"}); err != nil {
+	if err := register.InitServiceReg(SERVER_NAME, node, address, []string{"http://127.0.0.1:2379"}); err != nil {
 		panic(err)
 	}
 
 	// 实现gRPC Server
-	s := grpc.NewServer()
+	s := grpc.NewServer(grpc.UnaryInterceptor(tracer.OpentracingServerInterceptor(opentracing.GlobalTracer())))
 
 	// 注册helloServer为客户端提供服务
 	proto.RegisterHelloServer(s, &helloService{})

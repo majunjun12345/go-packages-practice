@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"sync"
 	"testGoScripts/grpc-server-register-find/resolver"
+	"testGoScripts/grpc-server-register-find/tool/tracer"
 	"time"
 
 	"git.internal.yunify.com/manage/common/etcd/balancer"
+	"github.com/opentracing/opentracing-go"
 	"github.com/xiaomeng79/go-log"
 	etcd "go.etcd.io/etcd/clientv3"
 	"google.golang.org/grpc"
@@ -57,17 +59,25 @@ func withOptions() []grpc.DialOption {
 			Timeout:             time.Second * 20, // 如果ping ack 1s之内未返回则认为连接已断开
 			PermitWithoutStream: true,             // 果没有active的stream,是否允许发送ping
 		}),
+		grpc.WithUnaryInterceptor(
+			tracer.OpenTracingClientInterceptor(opentracing.GlobalTracer()),
+		),
 	}
 }
 
-func (c *ClientPool) Register(name string) error {
+func (c *ClientPool) FindServer(name string) error {
 	etcdConfg := etcd.Config{
 		Endpoints: c.Addr,
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	resolver.RegisterResolver("etcd", etcdConfg, name, GRPC_VERSION)
-	conn, err := grpc.DialContext(ctx, "etcd:///", withOptions()...) // grpc.WithBalancerName(balancer.RoundRobin),
+	conn, err := grpc.DialContext(ctx, "etcd:///", grpc.WithInsecure(),
+		grpc.WithInsecure(),
+		grpc.WithBalancerName(balancer.RoundRobin),
+		grpc.WithUnaryInterceptor(
+			tracer.OpenTracingClientInterceptor(opentracing.GlobalTracer()),
+		))
 
 	if err != nil {
 		log.Warnf("grpc dial service(%s) error:%s", name, err.Error())
@@ -78,7 +88,8 @@ func (c *ClientPool) Register(name string) error {
 	c.Clients[name] = conn
 	return nil
 }
-func (c *ClientPool) UnRegister(name string) {
+
+func (c *ClientPool) OmitServer(name string) {
 	c.Lock.Lock()
 	defer c.Lock.Unlock()
 	if v, ok := c.Clients[name]; ok {
