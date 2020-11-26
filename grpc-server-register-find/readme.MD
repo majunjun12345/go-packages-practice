@@ -1,3 +1,5 @@
+[CNCF 刚宣布 etcd 正式毕业：赶紧实战下 etcd 的服务发现](https://mp.weixin.qq.com/s/44duJY9BSS3Ki07jt4pgOA)
+
 实现了
 * 服务注册
 * 命名解析
@@ -15,3 +17,4 @@
   // JAEGER_SAMPLER_PARAM=1
   http-gateway(start trace: root span) => grpc client(span) => grpc server(span)
   在 gin => grpc client 时特别要注意 ctx 的传递, timeout 是在 r.Use(Tracer()) 传递进去的
+  全链路：agent query es [Jaeger OpenTracing 体验](https://blog.csdn.net/nia305/article/details/90757235)

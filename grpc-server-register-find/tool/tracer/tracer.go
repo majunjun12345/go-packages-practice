@@ -126,7 +126,7 @@ func OpentracingServerInterceptor(tracer opentracing.Tracer) grpc.UnaryServerInt
 		if !ok {
 			md = metadata.New(nil)
 		}
-		// 从 http 请求里面解析出上一个服务的span信息
+		// 解析出上一个服务的span信息
 		spanContext, err := tracer.Extract(opentracing.TextMap, MDReaderWriter{md})
 		if err != nil && err != opentracing.ErrSpanContextNotFound {
 			panic(err)
