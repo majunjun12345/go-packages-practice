@@ -60,7 +60,7 @@ func main() {
 
 	// 注册helloServer为客户端提供服务
 	proto.RegisterHelloServer(s, &helloService{})
-	reflection.Register(s)
+	reflection.Register(s) // grpcui
 
 	if listen, err = net.Listen("tcp", address); err != nil {
 		panic(err)

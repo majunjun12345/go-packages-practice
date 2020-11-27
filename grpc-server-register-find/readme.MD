@@ -9,6 +9,14 @@
     [你喜欢的 Go 第三方库：一步为系统集成可视化实时运行时统计](https://polarisxu.studygolang.com/posts/go/pkg/statsviz/)
     [通过这个 Runtime 统计信息可视化库学到了什么？](https://mp.weixin.qq.com/s/sRxKJa-zKo-Lb7KRKLhthA)
 * 使用 grpcui 进行 grpc 调用
+  [[系列] Go gRPC 调试工具](https://www.cnblogs.com/xinliangcoder/p/11825748.html)
+  grpcui -plaintext 127.0.0.1:1234(grpc ip:port)
+* 使用 grpcurl
+  grpcurl --plaintext 127.0.0.1:1234 list
+  grpcurl --plaintext 127.0.0.1:1234 list proto.Hello
+  grpcurl --plaintext 127.0.0.1:1234 describe proto.Hello
+  调用方法: `grpcurl -plaintext -d '{"name": "mamenglihahaha"}' localhost:1234 proto.Hello/SayHello`
+
 * 整合 trace jeager: http://127.0.0.1:16686
   // JAEGER_AGENT_HOST=127.0.0.1
   // JAEGER_AGENT_PORT=6831
