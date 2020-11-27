@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/astaxie/beego"
+	"github.com/robfig/cron"
 )
 
 const (
@@ -87,24 +88,59 @@ func main() {
 
 	// t, _ := time.ParseInLocation("2006-01-02", todayDateStr, time.Local)
 	// fmt.Println(t.UnixNano() / 1e6)
-	count := 100
-	deviceNumChan = make(chan int, count)
-	for i := 0; i < count; i++ {
-		deviceNumChan <- i
-	}
-	close(deviceNumChan)
+	// count := 100
+	// deviceNumChan = make(chan int, count)
+	// for i := 0; i < count; i++ {
+	// 	deviceNumChan <- i
+	// }
+	// close(deviceNumChan)
 
-	for k := 0; k < MAXGOROUTINENUM; k++ {
-		wgStart.Add(1)
-		go func() {
-			defer wgStart.Done()
+	// for k := 0; k < MAXGOROUTINENUM; k++ {
+	// 	wgStart.Add(1)
+	// 	go func() {
+	// 		defer wgStart.Done()
 
-			for i := range deviceNumChan {
-				fmt.Println("======================", i)
-			}
-		}()
-	}
-	wgStart.Wait()
+	// 		for i := range deviceNumChan {
+	// 			fmt.Println("======================", i)
+	// 		}
+	// 	}()
+	// }
+	// wgStart.Wait()
+
+	// ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second*1)
+	// defer cancelFunc()
+	// time.Sleep(2 * time.Second)
+	// // 覆盖了
+	// ctx2, cancelFunc2 := context.WithTimeout(ctx, time.Second*5)
+	// defer cancelFunc2()
+	// v, ok := ctx2.Deadline()
+	// fmt.Println(v, ok)
+	// fmt.Println(time.Now().Format(time.RFC3339))
+
+	// time.Sleep(6 * time.Second)
+
+	// cronJob1 := cron.New()
+	// cronJob1.AddFunc("@every 1m", func() {
+	// 	fmt.Println(time.Now().Format("2006-01-02 15:04:05"))
+	// 	fmt.Println("hahah")
+	// })
+	// cronJob1.Start()
+
+	// cronJob2 := cron.New()
+	// cronJob2.AddFunc("@every 10s", func() {
+	// 	fmt.Println(time.Now().Format("2006-01-02 15:04:05"))
+	// 	fmt.Println("hahah")
+	// })
+	// cronJob2.Start()
+
+	cronJob := cron.New()
+	cronJob.AddFunc("0 42 21 * * *", func() {
+		fmt.Println(time.Now().Format("2006-01-02 15:04:05"))
+		fmt.Println("hahah")
+	})
+	cronJob.Start()
+
+	select {}
 }
 
 // 测试 omitempty
@@ -313,188 +349,3 @@ func tSelect() {
 		}
 	}
 }
-
-const (
-	Root              = "IoT."
-	common            = Root + "Common."
-	system            = Root + "System."
-	device            = Root + "Device."
-	thing             = Root + "Thing."
-	asset             = Root + "Asset."
-	video             = Root + "Video."
-	service           = Root + "Service."
-	deviceGroup       = Root + "DeviceGroup."
-	property          = Root + "Property."
-	alarm             = Root + "Alarm."
-	task              = Root + "Task."
-	token             = Root + "Token."
-	dataExportRecord  = Root + "DataExportRecord."
-	objectStorageConf = Root + "DataExport."
-	auth              = Root + "Auth."
-)
-
-const (
-	NotExisted  = "NotExisted"
-	NameExisted = "NameExisted"
-	IdExisted   = "IdExisted"
-	ConfExisted = "ConfExisted"
-)
-
-const (
-	Success       = system + "Success"
-	InternalError = system + "InternalError"
-	SystemError   = system + "SystemError"
-	RpcTimeOut    = system + "TimeOut"
-
-	ParamsTooLong       = common + "ParamsTooLong"
-	ResourceNotExisted  = common + "ResourceNotExisted"
-	InternalParamsError = common + "InternalParamsError"
-)
-const (
-	//device
-	DeviceNotExisted                 = device + NotExisted
-	DeviceNameExisted                = device + NameExisted
-	DeviceNamePrefixExisted          = device + "NamePrefixExisted"
-	DeviceInvalid                    = device + "Invalid"
-	ParentDeviceNotExisted           = device + "ParentDevice" + NotExisted
-	InvalidParentDevice              = device + "InvalidParentDevice"
-	ExistSubDevice                   = device + "ExistSubDevice"
-	DeviceStatusSwitchForbidden      = device + "DeviceStatusSwitchForbidden"
-	InvalidDeviceStatus              = device + "InvalidDeviceStatus"
-	ParentDeviceExistInSubDevices    = device + "ParentDeviceExistInSubDevices"
-	DeviceTreeHeightExceed           = device + "DeviceTreeHeightExceed"
-	DeviceAlreadyExistParent         = device + "DeviceAlreadyExistParent"
-	UpdateDevicePropertyStatusFailed = device + "UpdateDevicePropertyStatusFailed"
-	InvalidDeviceAccessProtocol      = device + "InvalidDeviceAccessProtocol"
-	InvalidDeviceColumn              = device + "InvalidDeviceColumn"
-
-	DeviceNameTooLong                  = device + "DeviceNameTooLong"
-	TaskNamePrefixExisted              = device + "TaskNamePrefixExisted"
-	CredentialHasExpired               = device + "CredentialHasExpired"
-	RegisterFailedByTaskStatus         = device + "RegisterFailedByTaskStatus"
-	TaskHasExpired                     = device + "TaskHasExpired"
-	RegisterFailedByExceededTaskMaxNum = device + "RegisterFailedByExceededTaskMaxNum"
-	ResourceIdentifierExisted          = device + "ResourceIdentifierExisted"
-	DevicePropertyExisted              = device + "Property" + IdExisted
-
-	//thing
-	ThingNotExisted           = thing + NotExisted
-	ThingNameExisted          = thing + NameExisted
-	ThingIdExisted            = thing + IdExisted
-	ThingAssociatedWithDevice = thing + "AssociatedWithDevice"
-	ThingPropertyExisted      = thing + "Property" + IdExisted      //模型下属性标识符已存在
-	ThingEventExisted         = thing + "Event" + IdExisted         //模型下事件标识符已存在
-	ThingEventOutputExisted   = thing + "EventOutput" + IdExisted   //模型下事件输出参数标识已存在
-	ThingServiceExisted       = thing + "Service" + IdExisted       //模型下服务标识符已存在
-	ThingServiceOutputExisted = thing + "ServiceOutput" + IdExisted //模型下服务输出参数标识已存在
-	ThingServiceInputExisted  = thing + "ServiceInput" + IdExisted  //模型下服务输入参数标识已存在
-	ThingPropertyNotExisted   = thing + "Property" + NotExisted
-	ThingExistDevice          = thing + "ThingExistDevice"
-
-	// task
-	TaskExpireTimeInvalid = task + "ExpireTimeInvalid"
-
-	//video
-	VideoCreateFail = video + "DeviceCreateFail"
-	VideoDeleteFail = video + "DeviceDeleteFail"
-
-	//alarm
-	AlarmPolicyCreateFail = alarm + "PolicyCreateFail"
-
-	//asset
-	AssetNotExisted    = asset + NotExisted
-	AssetNameExisted   = asset + NameExisted
-	AssetMissingParams = asset + "MissingParams"
-	//group
-	CanNotDeleteRootDeviceGroup    = deviceGroup + "CanNotDeleteRootDeviceGroup"
-	DeviceGroupNotExisted          = deviceGroup + NotExisted
-	DeviceGroupNameExisted         = deviceGroup + NameExisted
-	DeviceGroupIllegalResourceType = deviceGroup + "IllegalResourceType"
-
-	//token
-	TokenNotExisted = token + NotExisted
-
-	//ServiceInfoExisted = service + "ServiceInfo" + IdExisted
-
-	ParamsInvalid             = common + "ParamsInvalid"
-	AccountError              = common + "AccountError"
-	PitrixError               = common + "PitrixError"
-	IAMError                  = common + "IAMError"
-	IllegalAccessKey          = common + "IllegalAccessKey"
-	AccessKeyNotActive        = common + "AccessKeyNotActive"
-	UserNotFound              = common + "UserNotFound"
-	UserNotFinishRegistration = common + "UserNotFinishRegistration"
-	UserAccessDenied          = common + "UserAccessDenied"
-	SuperUserOnly             = common + "SuperUserOnly"
-	ResourceNotFound          = common + "ResourceNotFound"
-
-	InvalidPropertyType = property + "InvalidPropertyType"
-	InvalidAccessType   = property + "InvalidAccessType"
-
-	// data-export
-	DataExportRecordNotExisted  = dataExportRecord + NotExisted
-	ObjectStorageConfNotExisted = objectStorageConf + NotExisted
-	ObjectStorageConfExisted    = objectStorageConf + ConfExisted
-	AuthNotExisted              = auth + NotExisted
-)
-
-var (
-	Errors = map[string]string{
-		InternalError:                      "内部错误",
-		InternalParamsError:                "内部参数错误",
-		SystemError:                        "系统错误",
-		DeviceNotExisted:                   "设备不存在",
-		DeviceNameExisted:                  "设备名称已存在",
-		DeviceInvalid:                      "无效设备",
-		ParentDeviceNotExisted:             "父设备不存在",
-		InvalidParentDevice:                "无效父设备",
-		ExistSubDevice:                     "存在子设备",
-		InvalidDeviceStatus:                "无效设备状态",
-		ParentDeviceExistInSubDevices:      "父设备存在于待添加的子设备列表",
-		DeviceTreeHeightExceed:             "设备树高度超过限制",
-		DeviceAlreadyExistParent:           "设备已存在父设备",
-		UpdateDevicePropertyStatusFailed:   "更新设备属性状态失败",
-		DeviceNameTooLong:                  "设备名称长度不能超过限制",
-		ThingNotExisted:                    "模型不存在",
-		ThingNameExisted:                   "模型名称已存在",
-		ThingAssociatedWithDevice:          "不能删除已关联到设备的模型",
-		ThingPropertyNotExisted:            "模型属性不存在",
-		TaskNamePrefixExisted:              "批次名称前缀已存在",
-		CredentialHasExpired:               "凭证已过期",
-		RegisterFailedByTaskStatus:         "注册失败",
-		TaskHasExpired:                     "任务已过期",
-		RegisterFailedByExceededTaskMaxNum: "注册失败, 超过任务限制最大数量",
-		ResourceIdentifierExisted:          "资源标识符已存在",
-		AssetNotExisted:                    "资产信息不存在",
-		DeviceGroupNameExisted:             "设备组已存在",
-		DeviceGroupNotExisted:              "设备组不存在",
-		CanNotDeleteRootDeviceGroup:        "不能删除根设备组",
-		ParamsTooLong:                      "参数值长度超过限制",
-		DeviceGroupIllegalResourceType:     "非法设备组资源类型",
-		DeviceNamePrefixExisted:            "设备名称前缀已存在",
-		ResourceNotFound:                   "资源未发现",
-		AccountError:                       "请求账户错误",
-		PitrixError:                        "云平台错误",
-		IAMError:                           "请求IAM错误",
-		AssetMissingParams:                 "缺少参数",
-		ThingIdExisted:                     "模型Id已存在",
-		//ServiceInfoExisted:                 "服务信息已存在",
-		IllegalAccessKey:          "非法AK",
-		AccessKeyNotActive:        "不可用的API密匙",
-		UserNotFound:              "用户不存在",
-		UserNotFinishRegistration: "用户未完成注册",
-		UserAccessDenied:          "用户连接被拒绝",
-		SuperUserOnly:             "只允许超级用户访问",
-		ParamsInvalid:             "参数无效",
-		ThingPropertyExisted:      "模型属性已存在",
-		ThingEventExisted:         "模型下事件标识符已存在",    //模型下事件标识符已存在
-		ThingServiceExisted:       "模型下服务标识符已存在",    //模型下服务标识符已存在
-		ThingEventOutputExisted:   "模型下事件输出参数标识已存在", //模型下事件输出参数标识已存在
-		ThingServiceOutputExisted: "模型下服务输出参数标识已存在", //模型下服务输出参数标识已存在
-		ThingServiceInputExisted:  "模型下服务输入参数标识已存在", //模型下服务输入参数标识已存在
-
-		ThingExistDevice:    "模型下已存在设备",
-		VideoCreateFail:     "设备创建失败",
-		InvalidDeviceColumn: "无效设备字段",
-	}
-)
