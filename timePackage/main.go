@@ -59,6 +59,8 @@ func main() {
 	// }
 
 	// fmt.Println(filenames)
+
+	RFC3339ToCSTLayout("2020-11-08T08:18:46+08:00")
 }
 
 func init() {
@@ -66,7 +68,17 @@ func init() {
 	if cst, err = time.LoadLocation("Asia/Shanghai"); err != nil {
 		panic(err)
 	}
-	fmt.Println("======", time.Now().In(cst).Format("2006-01-02 15:04:05.000"))
+}
+
+const CSTLayout = "2006-01-02 15:04:05"
+
+// RFC3339ToCSTLayout convert rfc3339 value to china standard time layout
+func RFC3339ToCSTLayout(value string) (string, error) {
+	ts, err := time.ParseInLocation(time.RFC3339, value)
+	if err != nil {
+		return "", err
+	}
+	return ts.In(cst).Format(CSTLayout), nil
 }
 
 /*

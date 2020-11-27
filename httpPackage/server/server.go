@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	_ "net/http/pprof"
@@ -15,6 +16,9 @@ func main() {
 		fmt.Println(http.ListenAndServe("localhost:6060", nil))
 	}()
 	http.ListenAndServe(":1234", nil)
+	var err error
+	serr, ok := err.(*json.SyntaxError)
+	serr.Offset
 }
 
 /*

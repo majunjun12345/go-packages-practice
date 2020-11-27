@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/Unknwon/com"
+	"github.com/unknwon/com"
 	"github.com/tealeg/xlsx"
 )
 

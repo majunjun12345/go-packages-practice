@@ -1,5 +1,7 @@
 [InFluxDB数据库使用手册](cnblogs.com/huang-yc/p/10487455.html)
 
+开源的时序数据库，用 go 编写，被广泛应用于存储系统的监控数据，IOT 行业的实时数据等场景;
+
 influxDB名词  传统数据库概念
 database     数据库
 measurement  数据表

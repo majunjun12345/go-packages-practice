@@ -37,22 +37,23 @@ func TestSyncMap() {
 	// 删除
 	syncMap.Delete("name")
 
-	// 遍历
-	syncMap.Range(func(k, v interface{}) bool {
+	rangeCall := func(k, v interface{}) bool {
 		fmt.Println(k, v)
 		return true
-	})
+	}
+
+	// 遍历
+	syncMap.Range(rangeCall)
 	// 如果 map 中存在 age 给定的值，那么返回该值；如果不存在, 存储该键值对并返回值；如果 map 中存在 key，返回 true，不存在则返回 false；
 	fmt.Println(syncMap.LoadOrStore("age", "22"))
 	fmt.Println(syncMap.LoadOrStore("married", false))
 	fmt.Println(syncMap.LoadOrStore("home", "xiantao"))
 
 	for i := 0; i < 100; i++ {
-		go func() {
+		go func(i int) {
 			syncMap.Store(i, i)
-		}()
+		}(i)
 	}
-	fmt.Println(syncMap)
 }
 
 var m map[int]int = make(map[int]int)
