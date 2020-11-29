@@ -7,6 +7,7 @@ require (
 	git.internal.yunify.com/manage/common v0.0.0-20201117011148-37d215f37072
 	github.com/Shopify/sarama v1.19.0
 	github.com/Workiva/go-datastructures v1.0.50
+	github.com/afex/hystrix-go v0.0.0-20180502004556-fa1af6a1f4f5
 	github.com/alecthomas/kingpin v2.2.6+incompatible
 	github.com/alexedwards/scs/v2 v2.4.0 // indirect
 	github.com/arl/statsviz v0.2.1
