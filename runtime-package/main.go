@@ -13,12 +13,12 @@ import (
 
 func main() {
 	// testSched()
-	// testPrintStack()z
+	testPrintStack()
 	// demo.demo2()
 }
 
 func testSched() {
-	// 1 : 0 1 2 3 4 a 5 6 7 8 9，让出 cpu 时间片输出 a
+	// 1 : 0 1 2 3 4 b a 5 6 7 8 9，让出 cpu 时间片输出 a
 	// 2 随机，也有可能在输出 a 之前主进程就退出了，说明 主协程 和 go 携程 绑定了不同的 p
 	runtime.GOMAXPROCS(1)
 	exit := make(chan int)
@@ -45,6 +45,8 @@ func testPrintStack() {
 	defer func() {
 		if err := recover(); err != nil {
 			debug.PrintStack()
+			_, file, line, ok := runtime.Caller(3)
+			fmt.Println("=====", file, line, ok)
 		}
 	}()
 	a := 1
