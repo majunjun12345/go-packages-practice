@@ -47,4 +47,4 @@ go test 是带缓存的，go test -count=1 可以去除缓存, 表示重复执�
 
 - 如果测试之前需要做初始化的东西呢?
     定义 TestMain 函数, 作为整个 test case 的入口, 做一些初始化工作,比如数据库连接文件打开登录等;
-    里面必须有 M.Run(), 不然其他 test case 不会执行
+    里面必须有 m.Run(), 不然其他 test case 不会执行
