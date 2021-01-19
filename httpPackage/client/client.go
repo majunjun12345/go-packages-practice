@@ -5,10 +5,15 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"strings"
 	"time"
 )
+
+/*
+	[[译] 初学者需要了解的Go语言中的HTTP timeout](https://studygolang.com/articles/26359?fr=sidebar)
+*/
 
 func main() {
 	// Get1()
@@ -16,6 +21,37 @@ func main() {
 	// Post2()
 	// Post3()
 	p4()
+}
+
+func newHttpClient() *http.Client {
+
+	t := http.DefaultTransport.(*http.Transport).Clone()
+	t.MaxIdleConns = 100 // 连接池大小，为 0 表示没有限制，断开超过部分
+	/*
+		默认 MaxConnsPerHost=2
+		当一个 host 请求多次时，服务端同时只能处理两次，其他请求将处于 TIME_WAIT 状态，将会消耗服务器资源，直至崩溃
+		所以这里最好和 MaxIdleConns 保持一致，为 100
+	*/
+	t.MaxConnsPerHost = 100
+	t.MaxIdleConnsPerHost = 100
+
+	client := &http.Client{
+		/*
+			超时
+			完整的请求周期：dialer(三次握手)、TLS 握手、请求头和请求体的生成和发送、响应头及响应体的接收;
+			client 处的 timeout 定义完整的请求周期超时时间，这里最好不超过 10s;
+		*/
+		Timeout: time.Second * 10,
+		/*
+			transport的主要功能其实就是缓存了长连接，用于大量http请求场景下的连接复用，减少发送请求时TCP(TLS)连接建立的时间损耗，
+			同时transport还能对连接做一些限制，如连接超时时间，每个host的最大连接数等；
+
+			DialContext：用于控制 dial 即三次握手的超时时间；
+			KeepAlive：心跳间隔；
+		*/
+		Transport: t,
+	}
+	return client
 }
 
 // get
@@ -103,4 +139,18 @@ func CheckErr(err error) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func p5() {
+	svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		time.Sleep(time.Hour)
+	}))
+	defer svr.Close()
+
+	client := &http.Client{
+		// Timeout: time.Second * 5, // 如果这里没有 timeout，将会一直等待一小时
+	}
+	fmt.Println("making request")
+	_, err := client.Get(svr.URL)
+	fmt.Println("finished request", err)
 }
