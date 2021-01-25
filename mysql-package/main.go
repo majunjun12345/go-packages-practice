@@ -10,7 +10,7 @@ import (
 )
 
 /*
-	https://medium.com/impopper-engineering/go-concurrency-query-in-mysql-transactions-f6018c7b16b2
+	[深入剖析在事务中并发执行查询异常](https://medium.com/impopper-engineering/go-concurrency-query-in-mysql-transactions-f6018c7b16b2)
 	执行 query 语句获取 rows，数据还在 buffer 里面没有读出来，用 for rows.Next(){rows1.Scan()} 可以将数据读出来（next取出buffer内数据，scan绑定数据），清空 buffer，close 也可以；
 	一个事物维持一个连接，如果在读出来之前执行另一个 query 操作，会导致 busy buffer
 
@@ -45,16 +45,16 @@ import (
 
 /*
 	DROP TABLE IF EXISTS `user`;
-	CREATE TABLE `user` (
-		`id` INT(10) NOT NULL AUTO_INCREMENT,
-		`username` VARCHAR(64) NULL DEFAULT "majun",
-		`created` DATETIME NULL DEFAULT "1990-09-28 06:15:15",
-		`married` BOOLEAN NOT NULL DEFAULT TRUE,
-		PRIMARY KEY (`id`)
-	);
+CREATE TABLE `user_info` (
+	`id` INT(10) NOT NULL AUTO_INCREMENT COMMENT '自增id',
+	`username` VARCHAR(64) NULL DEFAULT "majun" COMMENT '用户名',
+	`created` DATETIME NULL DEFAULT "1990-09-28 06:15:15" COMMENT '创建时间',
+	`married` BOOLEAN NOT NULL DEFAULT TRUE COMMENT 'haha',
+	PRIMARY KEY (`id`)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT=' 用户管理';
 */
 
-type UserInfo struct {
+type user_info struct {
 	Id          int       `db:"id"`
 	Username    string    `db:"username"`
 	CreatedTime time.Time `db:"created"`
@@ -63,66 +63,69 @@ type UserInfo struct {
 
 var DB *sql.DB
 
-func StartMysql() {
-	db, err := sql.Open("mysql", "root:123456@tcp(127.0.0.1:3306)/goTest?charset=utf8&parseTime=true")
-	// defer db.Close()
-	CheckErr(err)
-	err = db.Ping() // open 并不会建立一个连接,只有当你使用的时候才会建立连接,所以这里需要提前 ping 一下,确保连接正常
-	if err != nil {
-		panic(err.Error())
+func init() {
+	var err error
+	if DB, err = sql.Open("mysql", "root:Mj900928@tcp(127.0.0.1:3306)/orm_db?charset=utf8&parseTime=true"); err != nil {
+		panic(err)
 	}
-	DB = db
+	if err = DB.Ping(); err != nil { // open 并不会建立一个连接,只有当你使用的时候才会建立连接,所以这里需要提前 ping 一下,确保连接正常
+		panic(err)
+	}
+
 	DB.SetConnMaxLifetime(100 * time.Second) //最大连接周期，超过时间的连接就close
 	DB.SetMaxOpenConns(10)                   //设置最大连接数
-	DB.SetMaxIdleConns(10)                   //设置闲置连接数
+	DB.SetMaxIdleConns(5)                    //设置闲置连接数
 }
 
 func main() {
-	StartMysql()
 	// insert()
 
 	// query()
 
-	// tx()
+	tx()
 
-	QueryNoRows()
+	// queryNoRows()
 }
 
 // --------------------------insert exec 主要是执行插入和更新操作
 // 两种插入方式
 func insert() {
-	stmt, err := DB.Prepare("INSERT userinfo set username=?, created=?, married=?") // 最好先使用预处理
+	stmt, err := DB.Prepare("INSERT user_info set username=?, created=?, married=?") // 最好先使用预处理(这种方式)
 	CheckErr(err)
 	_, err = stmt.Exec("memglima", GetTime(), false)
 	CheckErr(err)
 
-	DB.Exec("INSERT userinfo set username=?, created=?, married=?", "memglima", GetTime(), false)
+	DB.Exec("INSERT user_info set username=?, created=?, married=?", "memglima", GetTime(), false)
 }
 
 // --------------------------query 主要是执行 查询 操作
 func query() {
 	/*
-		返回的 row 必须使用 scan，不然会导致连接无法关闭，一直处于连接状态
+		返回的 row 必须调用 Close 将连接返还连接池, 会导致超出最大连接数限制，并导致死锁或者高延迟；
+		[为何sql.Rows使用结束后一定要Close](https://blog.csdn.net/xz_studying/article/details/109588435)
+
+		**当你使用它执行数据库 **查询** 等任务时，一个连接就会被标记成 in-use；任务执行完成后该连接又会被标记成 idle。**
+
 		query 语句会建立一次连接，使用 next scan 后清空的是 buffer 并不是关闭连接   https://www.jianshu.com/p/06f26f879d61
 		rows.close 才是关闭的连接
 		* 也可以替换为具体的查询字段
 	*/
-	rows, err := DB.Query("select id , username, created, married from userinfo") // QueryRow 查询一行
-	defer rows.Close()                                                            // 这里才是关闭 query 的连接
+	rows, err := DB.Query("select id , username, created, married from user_info") // QueryRow 查询一行
+	defer rows.Close()                                                             // 这里才是关闭 query 的连接
 
 	if err != nil {
 		panic(err)
 	}
 	var t string
-	var n int
+	var b bool
 	for rows.Next() {
-		user := UserInfo{}
+		user := user_info{}
 		// 参数绑定需要进行错误处理
-		if err := rows.Scan(&user.Id, &user.Username, &t, &n); err != nil { // 和 query 一一对应,最好不要用 *
+		if err := rows.Scan(&user.Id, &user.Username, &t, &b); err != nil { // 和 query 一一对应,最好不要用 *
 			fmt.Println(err)
 			continue // 如果有错误，则忽略这条记录
 		}
-		fmt.Println(n)
+		fmt.Println(user)
 	}
 	if err := rows.Err(); err != nil { // 再次进行判断，遍历过程中是否有错误产生
 		fmt.Println(err)
@@ -130,12 +133,12 @@ func query() {
 
 	// 查询单条记录
 	var username string
-	row := DB.QueryRow("select userna from userinfo where id=?", 3)
+	row := DB.QueryRow("select username from user_info where id=?", 2)
 	err = row.Scan(&username)
-	switch {
-	case err == sql.ErrNoRows: // 查询单条数据可能出现没有该条记录的错误，需要单独处理
+	switch err {
+	case sql.ErrNoRows: // 查询单条数据可能出现没有该条记录的错误，需要单独处理
 		fmt.Println("no such data")
-	case err != nil:
+	case nil:
 		if _, file, line, ok := runtime.Caller(3); ok { // // 使用该方式可以打印出运行时的错误信息, 该种错误是编译时无法确定的
 			fmt.Println(err, file, line)
 		}
@@ -148,7 +151,7 @@ func query() {
 	err = DB.QueryRow(`
         SELECT
             SUM(id) id
-        FROM userinfo
+        FROM user_info
         WHERE id = ?
         HAVING id <> NULL
     `, 10).Scan(&id)
@@ -160,17 +163,17 @@ func query() {
 	fmt.Println(id)
 }
 
-func QueryNoRows() {
+func queryNoRows() {
 	// 查询 row 为空，scan 返回对象的零值，err 为 sql.ErrNoRows
-	user := UserInfo{}
-	row := DB.QueryRow("select id , username, created, married from userinfo where id=?", 4)
+	user := user_info{}
+	row := DB.QueryRow("select id , username, created, married from user_info where id=?", 1)
 	err := row.Scan(&user.Id, &user.Username, &user.CreatedTime, &user.Married)
 	fmt.Println(user)
 	fmt.Printf("err0:%v\n", err)
 	fmt.Println(err == sql.ErrNoRows)
 
 	// 为空，不会报错，
-	stmt, err := DB.Prepare("select id , username, created, married from userinfo where id=?")
+	stmt, err := DB.Prepare("select id , username, created, married from user_info where id=?")
 	if err != nil {
 		fmt.Printf("err1:%v\n", err)
 	}
@@ -185,9 +188,9 @@ func QueryNoRows() {
 // --------------------------事物 tx
 func tx() { //这里没有清空 buffer，但是也没有报错，就有点不懂了
 	tx, _ := DB.Begin()
-	_, err1 := DB.Query("select id , username, created, married from user")
+	_, err1 := DB.Query("select id , username, created, married from user_info")
 
-	stmt, err3 := DB.Prepare("INSERT userinfo set username=?, created=?, married=?")
+	stmt, err3 := DB.Prepare("INSERT user_info set username=?, created=?, married=?")
 	_, err4 := stmt.Exec("memglima", GetTime(), false)
 
 	if err1 == nil && err3 == nil && err4 == nil {
