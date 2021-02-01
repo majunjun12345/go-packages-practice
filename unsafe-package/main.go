@@ -7,5 +7,5 @@ import "testGoScripts/unsafe-package/p"
 */
 
 func main() {
-	p.HandleV()
+	p.MemoryHandle()
 }

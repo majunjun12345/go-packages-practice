@@ -8,9 +8,9 @@ import (
 // 内存地址是 16进制 的
 
 type V struct {
-	i int32 // 4
-	j int64 // 8
-	k byte  // 1
+	i int32 // 4字节 32 位
+	j int64 // 8字节 64 位
+	k byte  // 1字节 8 位
 }
 
 func (v *V) Println() {
@@ -22,7 +22,8 @@ func (v *V) PrintAddress() {
 	fmt.Printf("i=%p, j=%p, k=%p \n", &v.i, &v.j, &v.k)
 }
 
-func HandleV() {
+// MemoryAlignment 内存对齐
+func MemoryAlignment() {
 	v := &V{}
 	fmt.Println(unsafe.Sizeof(v)) // 8  32位中为 4
 
@@ -45,20 +46,25 @@ func HandleV() {
 		iiii----|jjjjjjjj|k------- ,在后面再填充7个字节，达到24字节后，就满足上面的第二条规则了。至此就是v为何占用24字节。
 	*/
 	fmt.Println(unsafe.Sizeof(*v)) // 24  32位中为 16
+}
 
-	// 操作第一个私有变量 i
-	// 因为在go中结构体的指针就对应是第一个成员变量的指针，所以可以将 v 转换为第一个成员变量 i 的指针
+// MemoryHandle 内存操作
+func MemoryHandle() {
+	v := &V{}
+
+	// 操作第一个私有变量 i，因为在go中结构体的指针就对应是第一个成员变量的指针，所以可以将 v 转换为第一个成员变量 i 的指针
 	i := (*int32)(unsafe.Pointer(v)) // 先将 v 转换为普通指针，再将普通指针转换为 int32 指针
-	*i = 100                         // 解引用并赋值
+	*i = 100
+	v.Println() // 解引用并赋值
 	v.PrintAddress()
 
-	// 操作第二私有个变量 j
-	// j到i偏移了8个字节
+	// 操作第二私有个变量 j，j到i偏移了8个字节；   内存首地址                i 所占字节数              填充字节数
 	j := (*int64)(unsafe.Pointer(uintptr(unsafe.Pointer(v)) + uintptr(unsafe.Sizeof(int32(0))) + 4)) // 第一个 4 是 i 的字节，第二个 4 是填充的 4 个字节
 	*j = 200
 	v.Println()
 	v.PrintAddress()
 
+	// 操作第三个变量 k，k 到 j 偏移了 16 个字节； 内存首地址              i 所占字节数              填充字节数         j 所占字节数
 	k := (*byte)(unsafe.Pointer(uintptr(unsafe.Pointer(v)) + uintptr(unsafe.Sizeof(int32(0))) + 4 + uintptr(unsafe.Sizeof(int64(0))))) // 第一个 4 是 i 的字节，第二个 4 是填充的 4 个字节, 第三个 8 是 j 所占字节数
 	*k = 5
 	v.Println()
@@ -76,7 +82,7 @@ func HandleV() {
 	fmt.Println("Offsetof2:", unsafe.Offsetof(v.j)) // 8
 	fmt.Println("Offsetof3:", unsafe.Offsetof(v.k)) // 16
 
-	// uintptr 转换为可运算的指针
+	// uintptr 转换为可运算的指针，也就是在内存中的地址
 	fmt.Println("uintptr i:", uintptr(unsafe.Pointer(v)))                                                                     // 824633811552
 	fmt.Println("uintptr j:", uintptr(unsafe.Pointer(v))+uintptr(unsafe.Sizeof(int32(0)))+4)                                  // 824633811552 + 8
 	fmt.Println("uintptr k:", uintptr(unsafe.Pointer(v))+uintptr(unsafe.Sizeof(int32(0)))+4+uintptr(unsafe.Sizeof(int64(0)))) // 824633811552 + 16

@@ -63,9 +63,10 @@ require (
 	github.com/paulbellamy/ratecounter v0.2.0
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.1.0
-	github.com/qingcloud-iot/edge-app-go v0.0.0-20201125020549-7967cdc21332 // indirect
+	github.com/qingcloud-iot/edge-app-go v0.0.0-20201125020549-7967cdc21332
 	github.com/qingcloud-iot/edge-driver-go v0.0.0-20201030073905-730148ce9dd2
 	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0
+	github.com/reactivex/rxgo/v2 v2.4.0 // indirect
 	github.com/robfig/cron v1.2.0
 	github.com/satori/go.uuid v1.2.0
 	github.com/shiena/ansicolor v0.0.0-20151119151921-a422bbe96644 // indirect
@@ -94,6 +95,7 @@ require (
 	go.uber.org/zap v1.16.0
 	golang.org/x/net v0.0.0-20201110031124-69a78807bb2b
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
+	golang.org/x/sync v0.0.0-20201207232520-09787c993a3a
 	golang.org/x/sys v0.0.0-20201201145000-ef89a241ccb3 // indirect
 	golang.org/x/text v0.3.3
 	golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e

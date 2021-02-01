@@ -1,4 +1,5 @@
 ### unsafe
+[Golang unsafe.Pointer使用原则以及 uintptr 隐藏的坑](https://mp.weixin.qq.com/s/Z69DmbG6kVBFoODoE6mDrA)
 c 语言中提供了直接通过指针运算操作内存的方式，其他语言基本屏蔽了这点；
 go 中可以使用 unsafe 包绕过 go 的内存安全机制，直接对内存进行读写；
 
@@ -20,9 +21,7 @@ unsafe包提供的一个类型，任何指针类型都可以转换为Pointer类�
 Pointer类型也可以转换为任何指针类型。go中的指针不能进行运算(比如:*int),只能对数据进行读取和赋值。
 
 - uintptr 
-go的一个数据类型，它不是unsafe包提供的，它是一个足够大的整数类型，可以容乃任何的指针。
-上面的 Pointer类型可以转换为 uintptr类型，反过来uintptr类型也可以转换为Pointer类型。
-uintptr类型才能进行指针运算。
+uintptr 是一个16进制的整数，这个数字表示对象的地址，uintptr 没有指针的语义；
 
 unsafe.Pointer 可以让你无视 Go 的类型系统，完成任何类型与内建的 uintptr 类型之间的转化。
 根据文档，unsafe.Pointer 可以实现四种其他类型不能的操作：
