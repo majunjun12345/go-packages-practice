@@ -21,7 +21,8 @@ func main() {
 
 	// fmt.Println(sessionId())
 
-	randInt()
+	// randInt()
+
 }
 
 // 两种写法
@@ -33,9 +34,18 @@ func pseudoRand() {
 	fmt.Println(rand.Intn(100))
 	fmt.Println(rand.Int63n(100))
 
-	rand1 := rand.New(rand.NewSource(time.Now().UnixNano()))
+	rand1 := rand.New(rand.NewSource(time.Now().UnixNano())) // 非并发安全
 	for i := 0; i < 5; i++ {
 		fmt.Println(rand1.Int())
+		fmt.Println(rand.Intn(100))
+	}
+}
+
+func keng() {
+	for i := 0; i < 10; i++ {
+		rand.Seed(time.Now().Unix())
+		fmt.Printf("current:%d\n", time.Now().UnixNano())
+		fmt.Println(rand.Intn(100)) // 每次循环的这两个值都相同，但是同批次的值不同
 		fmt.Println(rand.Intn(100))
 	}
 }
@@ -62,7 +72,7 @@ func sessionId() string {
 	return base64.URLEncoding.EncodeToString(b)
 }
 
-// random int [0, max)
+// random int [0, 100)
 func randInt() {
 	b := new(big.Int).SetInt64(int64(100)) //将new(big.Int)设为int64(n)并返回new(big.Int)
 	i, err := realRank.Int(realRank.Reader, b)
