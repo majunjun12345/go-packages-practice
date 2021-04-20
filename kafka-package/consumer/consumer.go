@@ -10,13 +10,13 @@ import (
 var (
 	topic     = "test"
 	partition = 0 // 消费的时候需要指定 partition
-	addrs     = []string{"192.168.0.103:9092"}
+	addrs     = []string{"172.20.10.3:9092"}
 
 	wg sync.WaitGroup
 )
 
 func main() {
-
+	singleConsumer()
 }
 
 func singleConsumer() {
@@ -45,7 +45,7 @@ func singleConsumer() {
 		// ConsumePartition 方法根据 topic，分区和给定的偏移量创建创建了相应的分区消费者
 		// 如果该分区消费者已经消费了该信息将会返回error
 		// sarama.OffsetNewest:表明了为最新消息，-1
-		partitionConsumer, err := consumer.ConsumePartition(topic, partition, sarama.OffsetOldest)
+		partitionConsumer, err := consumer.ConsumePartition(topic, partition, sarama.OffsetNewest)
 		if err != nil {
 			fmt.Printf("Failed to consume partition: %v", err)
 			panic(err)

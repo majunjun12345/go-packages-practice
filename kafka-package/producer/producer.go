@@ -6,12 +6,13 @@ import (
 
 	"github.com/Shopify/sarama"
 	"github.com/golang/glog"
+	"github.com/spf13/cast"
 )
 
 var (
 	topic     = "test"
 	partition = 0 // 消费的时候需要指定 partition
-	addrs     = []string{"192.168.0.103:9092"}
+	addrs     = []string{"172.20.10.3:9092"}
 
 	saslEnable = false
 	tlsEnable  = false
@@ -21,14 +22,15 @@ var (
 )
 
 func main() {
-	syncProducer()
-	// asyncProducer()
+	// syncProducer()
+	asyncProducer()
 }
 
 // 消息量大必须用异步生产
 func asyncProducer() {
 	config := sarama.NewConfig()
 	config.Producer.Timeout = 5 * time.Second
+	config.Producer.Partitioner = sarama.NewRandomPartitioner // 随机分区
 	config.Producer.RequiredAcks = sarama.WaitForAll          //等待服务器所有副本都保存成功后的响应
 	config.Producer.Partitioner = sarama.NewRandomPartitioner //随机向partition发送消息
 	config.Producer.Return.Successes = true                   //是否等待成功和失败后的响应,只有上面的RequireAcks设置不是NoReponse这里才有用. 必须有这个选项
@@ -45,29 +47,43 @@ func asyncProducer() {
 	defer producer.AsyncClose()
 
 	// 创建协程用于接收异步生产结果通知，必须是在协程里面，不然阻塞主进程
-	go func(p sarama.AsyncProducer) {
+	// 如果打开了Return.Successes和Errors配置，而又没有p.Successes()提取，那么Successes()这个chan消息会被写满导致死锁。
+	go func() {
 		for {
 			select {
-			case err := <-p.Errors():
+			case err := <-producer.Errors():
 				if err != nil {
 					glog.Errorln(err)
 				}
-			// 如果打开了Return.Successes配置，而又没有p.Successes()提取，那么Successes()这个chan消息会被写满。
-			// config.Producer.Return.Successes = true和操作<-producer.Successes()必须配套使用
-			case suc := <-p.Successes():
+			case suc := <-producer.Successes():
 				fmt.Printf("producer success: %v\n", suc.Offset)
 			}
 		}
-	}(producer)
+	}()
 
-	msg := &sarama.ProducerMessage{
-		Topic: topic,
-		//Key:   sarama.StringEncoder("go_test"),
-		Value: sarama.ByteEncoder("this is message"),
+	client, err := sarama.NewClient(addrs, config)
+	if err != nil {
+		panic(err)
 	}
-	// 异步发送消息的方式
-	producer.Input() <- msg
-	select {}
+
+	for {
+
+		msg := &sarama.ProducerMessage{
+			Topic: topic,
+			Key:   sarama.StringEncoder("go_test"),
+			Value: sarama.ByteEncoder("this is message"),
+		}
+		// 异步发送消息的方式
+		producer.Input() <- msg
+
+		p, err := client.Partitions(topic)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("======partitions:", p)
+
+		time.Sleep(time.Second)
+	}
 }
 
 // 同步生产
@@ -82,11 +98,11 @@ func syncProducer() {
 	}
 	defer syncProducer.Close()
 
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 100000000; i++ {
 		//创建消息
 		msg := &sarama.ProducerMessage{}
 		msg.Topic = topic
-		msg.Value = sarama.StringEncoder("this is a good test,hello kai")
+		msg.Value = sarama.StringEncoder("this is a good test,hello kai" + " " + cast.ToString(i))
 		// 同步发送消息的方式
 		partition, offset, err := syncProducer.SendMessage(msg)
 		if err != nil {

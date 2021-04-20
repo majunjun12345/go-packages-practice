@@ -1,5 +1,7 @@
 docker run -d --name kafka -p 9092:9092 -e KAFKA_BROKER_ID=0 -e KAFKA_ZOOKEEPER_CONNECT=docker.for.mac.host.internal:2181/kafka -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://192.168.0.103:9092 -e KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092 wurstmeister/kafka
+
 KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://192.168.0.103:9092，为本机实际 ip，不能为 0.0.0.0
+
 docker run -d --name zookeeper -p 2181:2181 wurstmeister/zookeeper
 
 [再过半小时，你就能明白kafka的工作原理了](https://www.cnblogs.com/sujing/p/10960832.html)
@@ -45,7 +47,16 @@ kafka 的 HA 是通过 数据复制和leader选举来保证的
 - topic
   kafka 消息的类别，对数据(消息)进行分区、隔离
 - partition
-  kafka 下数据存储的节本单元，一个 topic 数据会被分散存储到一个或多个 partition中，每一个 partition 内数据是有序的。
+  kafka 下数据存储的节本单元，一个 topic 数据会被分散存储到一个或多个 partition中，每一个 partition 内数据是有序的，但是不能保证不同 partition 之间消息的顺序。
+  是消费者消费的基本单位，一个 partition 至多被一个消费者消费。单 partition 被多消费者消费可以使用消费组；原因：为保证顺序，kafka 强制点对点按顺序传递消息，意味着 consumer 在分区中的位置只有一个；
+    - 几个原则
+      1. partition在写入的时候可以指定需要写入的partition，如果有指定，则写入对应的partition。
+      2. 如果没有指定partition，但是设置了数据的key，则会根据key的值hash出一个partition。
+      3. 如果既没指定partition，又没有设置key，则会采用轮询⽅式，即每次取一小段时间的数据写入某个partition，下一小段的时间写入下一个partition
+    - 结构
+      每个 partition 的文件夹下会有多组 segment 文件夹
+      每个 segment 文件夹都包含 .index、 .log、 .timeindex 三个文件
+      .log ⽂件存储 message，.index 和 .timeindex 为索引⽂件，⽤于检索消息。
 - replication(副本)
   同一个 partition 可能会有多个副本，多个副本之间的数据是一样的；
 - 提交
@@ -73,10 +84,10 @@ Kafka不直接参与物理I/O操作，而是交由最擅长此事的操作系统
 Kafka使用顺序I/O进行读写
 使用以sendfile为代表的零拷贝技术加强了网络间的数据传输效率
 
-- 消息发送机制
-发送并忘记：发送消息，但不关心它是否真正到达
-同步发送：阻塞发送确保消息到达
-异步发送：非阻塞发送，不一定确保消息达到，但有重试机制(主要)  
+- ACK应答机制
+  0 代表producer往集群发送数据不需要等到集群的返回，不确保消息发送成功。安全性最低但是效 率最高。
+  1 代表producer往集群发送数据只要leader应答就可以发送下一条，只确保leader发送成功。
+  all 代表producer往集群发送数据需要所有的follower都完成从leader的同步才会发送下一条，确保 leader发送成功和所有的副本都完成备份。安全性最⾼高，但是效率最低。
 
 #### 五、kafka 的消费
 - 没有消费组的消费者
@@ -86,13 +97,16 @@ Kafka使用顺序I/O进行读写
   - consumer group下可以有一个或多个consumer instance，consumer instance可以是一个进程，也可以是一个线程
   - group.id是一个字符串，唯一标识一个consumer group
   - consumer group下订阅的topic下的每个分区只能分配给某个group下的一个consumer(当然该分区还可以被分配给其他group)
-- 消费组的 rebalance
+- 消费组的 **`rebalance`**
   rebalance规定了一个consumer group下的所有consumer如何达成一致来分配订阅topic的每个分区。比如某个group下有20个consumer，它订阅了一个具有100个分区的topic。正常情况下，Kafka平均会为每个consumer分配5个分区。这个分配的过程就叫rebalance。
   rebalance的触发条件有三种：
   - 组成员发生变更(新consumer加入组、已有consumer主动离开组或已有consumer崩溃了——这两者的区别后面会谈到)
   - 订阅主题数发生变更——这当然是可能的，如果你使用了正则表达式的方式进行订阅，那么新建匹配正则表达式的topic就会触发rebalance
   - 订阅主题的分区数发生变更
+- 消费状态
+  kafka 不保存消息为状态，即是否被消费；一般的消息系统需要保存消息的状态，并且还需要以随机访问的形式更新消息的状态。而Kafka 的做法是保存Consumer在Topic分区中的位置offset，在offset之前的消息是已被“消费”的，在offset之后则为未“消费”的，并且offset是可以任意移动的，这样可以消除了大部分的随机IO。
 
+- 延时消费
 ##### 六、注意事项
 [go 操作 kafka](https://www.cnblogs.com/gwyy/p/13266589.html)
 

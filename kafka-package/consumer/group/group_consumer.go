@@ -11,7 +11,7 @@ import (
 var (
 	topic     = "test"
 	partition = 0 // 消费的时候需要指定 partition
-	addrs     = []string{"192.168.0.103:9092"}
+	addrs     = []string{"172.20.10.3:9092"}
 )
 
 type consumerGroupHandler struct {
@@ -70,13 +70,13 @@ func main() {
 	wg.Add(3)
 
 	// TODO: wg 这里必须是传址
-	go consume(&g1, &wg, "c1")
-	go consume(&g2, &wg, "c2")
-	go consume(&g3, &wg, "c3")
+	go consume(g1, &wg, "g1")
+	go consume(g2, &wg, "g2")
+	go consume(g3, &wg, "g3")
 	wg.Wait()
 }
 
-func consume(group *sarama.ConsumerGroup, wg *sync.WaitGroup, name string) {
+func consume(group sarama.ConsumerGroup, wg *sync.WaitGroup, name string) {
 	fmt.Println(name + " " + "start")
 	defer wg.Done()
 	ctx := context.Background()
@@ -85,7 +85,7 @@ func consume(group *sarama.ConsumerGroup, wg *sync.WaitGroup, name string) {
 		topics := []string{topic}
 		handler := consumerGroupHandler{groupName: name}
 		// TODO: group 是 interface，传进来的参数是指针，取值后能够调用 interface 内的方法
-		err := (*group).Consume(ctx, topics, handler)
+		err := group.Consume(ctx, topics, handler)
 		if err != nil {
 			panic(err)
 		}

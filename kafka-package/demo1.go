@@ -34,7 +34,7 @@ import (
 var (
 	topic     = "test"
 	partition = 0 // 消费的时候需要指定 partition
-	addrs     = []string{"192.168.0.103:9092"}
+	addrs     = []string{"192.168.0.102:9092"}
 
 	saslEnable = false
 	tlsEnable  = false
@@ -43,12 +43,13 @@ var (
 	cacert     = ""
 
 	// consumer producer
-	command = "consumer"
+	command = "producer"
 )
 
 func main() {
-	// kafka()
+	go kafka()
 	metadata()
+	select {}
 }
 
 // 通过 client 创建 consumer 或 producer
@@ -178,7 +179,7 @@ func loopProducer(producer sarama.AsyncProducer, topic string) {
 	}
 }
 
-// metadata 元数据
+// metadata 元数据，一般用于中台的管理方面
 func metadata() {
 	var (
 		config  = sarama.NewConfig()
